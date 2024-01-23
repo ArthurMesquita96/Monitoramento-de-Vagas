@@ -3,15 +3,17 @@ import streamlit as st
 def app(data):
     st.write('Welcome')
     senioridade_option = st.multiselect(label = 'Senioridade',options = data['senioridade'].unique())
-    local_option = st.multiselect(label = 'Localidade',options = data['local'].unique())
+    cidade_option = st.multiselect(label = 'Cidade',options = data['cidade'].unique())
+    estado_option = st.multiselect(label = 'Estado',options = data['estado'].unique())
     modalidade_option = st.multiselect(label = 'Modalidade',options = data['modalidade'].unique())
     contrato_option = st.multiselect(label = 'Contrato',options = data['contrato'].unique())
 
     dict_filter = {
             'senioridade':senioridade_option,
-            'local': local_option,
             'modalidade':modalidade_option,
-            'contrato':contrato_option
+            'contrato':contrato_option,
+            'cidade': cidade_option,
+            'estado': estado_option
         }
 
     def verifica_filtros_vazios(dict_filter):

@@ -9,7 +9,7 @@ if __name__ == '__main__':
     st.set_page_config(layout='wide')
 
     # importando dados
-    data =  pd.read_excel('vagas_clean.xlsx')
+    data =  pd.read_excel('../data/data_clean/vagas_clean.xlsx')
 
     # Definindo páginas
     PAGES = {
