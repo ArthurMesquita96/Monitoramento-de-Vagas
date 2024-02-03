@@ -97,20 +97,41 @@ def get_job_opportunity_info(job_url: str, position: str) -> dict:
 
     job_page = BeautifulSoup(r.content, 'html')
 
+
+    # obtem os dados do JSON
+    try:
+        string_json = job_page.find_all('script', {'type': 'application/ld+json'})[-1].text.strip()
+        request_json = json.loads(string_json)
+    except:
+        request_json = None
+    
+
     
     job_info = {}
 
     job_info['site_da_vaga'] = 'Vagas.com'
-    job_info['posicao'] = position
-    job_info['link'] = 'https://www.vagas.com.br' + job_url
+    job_info['link_site'] = 'https://www.vagas.com.br' + job_url
+    job_info['link_origem'] = None
 
     try:
-        job_info['data_publicação'] = job_page.select('.job-breadcrumb li')[0].text.strip()
+        job_info['data_publicacao'] = job_page.select('.job-breadcrumb li')[0].text.strip()
     except:
-        job_info['data_publicação'] = None
+        job_info['data_publicacao'] = None
+
+    try:
+        job_info['data_expiracao_vaga'] = request_json.get('validThrough')
+    except:
+        job_info['data_expiracao_vaga'] = None
 
     
     job_info['data_coleta'] = datetime.today().strftime('%Y-%m-%d')
+    job_info['posicao'] = position
+    
+
+    try:
+        job_info['senioridade'] = job_page.select('.job-hierarchylist')[0].select_one('span').get('aria-label')
+    except:
+        job_info['senioridade'] = None
 
 
     try:
@@ -120,15 +141,17 @@ def get_job_opportunity_info(job_url: str, position: str) -> dict:
 
 
     try:
-        job_info['local'] = job_page.select('.info-localizacao')[0].text.strip()
+        job_info['nome_da_empresa'] = job_page.select('.job-shortdescription__company')[0].text.strip()
     except:
-        job_info['local'] = None
+        job_info['nome_da_empresa'] = None
 
 
     try:
-        job_info['senioridade'] = job_page.select('.job-hierarchylist')[0].select_one('span').get('aria-label')
+        job_info['cidade'] = request_json['jobLocation']['address'].get('addressLocality')
+        job_info['estado'] = request_json['jobLocation']['address'].get('addressRegion')
     except:
-        job_info['senioridade'] = None
+        job_info['cidade'] = None
+        job_info['estado'] = job_page.select('.info-localizacao')[0].text.strip()
 
 
     try:
@@ -139,7 +162,13 @@ def get_job_opportunity_info(job_url: str, position: str) -> dict:
     try:
         job_info['contrato'] = job_page.select('')[0].text.strip()
     except:
-        job_info['contrato'] = None
+        job_info['contrato'] = 'Não informado'
+
+
+    try:
+        job_info['regime'] = job_page.select('.info-modelo-contratual')[0].text.strip()
+    except:
+        job_info['regime'] = 'Não informado'
 
 
     try:
@@ -147,27 +176,17 @@ def get_job_opportunity_info(job_url: str, position: str) -> dict:
         benefits = job_page.select('.job-benefits__list')[0].find_all('span')
 
         for benefit in benefits:
-            job_info['beneficios'].append(benefit.text)
+            job_info['beneficios'].append(benefit.text.strip())
 
     except:
         job_info['beneficios'] = None
     
 
-    
-    try:
-        job_info['regime'] = job_page.select('.info-modelo-contratual')[0].text.strip()
-    except:
-        job_info['regime'] = None
-
-    try:
-        job_info['contrato'] = job_page.select('')[0].text.strip()
-    except:
-        job_info['contrato'] = None
 
     try:
         job_info['codigo_vaga'] = job_page.select('.job-breadcrumb li')[1].text.strip()
     except:
-        job_info['contrato'] = None
+        job_info['codigo_vaga'] = None
 
 
     try:
@@ -175,7 +194,6 @@ def get_job_opportunity_info(job_url: str, position: str) -> dict:
     except:
         job_info['descricao'] = None
         
-
 
     return job_info
 
