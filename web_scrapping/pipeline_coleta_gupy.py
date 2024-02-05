@@ -49,114 +49,114 @@ def vitrine_vagas_gupy(LINK, nome_vaga):
 
 def coleta_dados_vagas(soup, nome_vaga):
 
-        lista_de_vagas = soup.find_all('div', {'class':'sc-a3bd7ea-0 HCzvP'})
+    lista_de_vagas = soup.find_all('div', {'class':'sc-a3bd7ea-0 HCzvP'})
 
-        list_columns = [
-                'site_da_vaga',
-                'link_site',
-                'link_origem',
-                'data_publicacao',
-                'data_expiracao',
-                'data_coleta',
-                'posicao',
-                'titulo_da_vaga',
-                'local',
-                'modalidade',
-                'nome_empresa',
-                'contrato',
-                'regime',
-                'pcd',
-                'beneficios',
-                'codigo_vaga',
-                'descricao'
-        ]
+    list_columns = [
+            'site_da_vaga',
+            'link_site',
+            'link_origem',
+            'data_publicacao',
+            'data_expiracao',
+            'data_coleta',
+            'posicao',
+            'titulo_da_vaga',
+            'local',
+            'modalidade',
+            'nome_empresa',
+            'contrato',
+            'regime',
+            'pcd',
+            'beneficios',
+            'codigo_vaga',
+            'descricao'
+    ]
 
-        df_vagas = pd.DataFrame(
-                columns = list_columns
-            )
+    df_vagas = pd.DataFrame(
+            columns = list_columns
+        )
 
-        for vaga in lista_de_vagas:
+    for vaga in lista_de_vagas:
 
-            df_aux = pd.DataFrame(
-                columns = list_columns
-            )
+        df_aux = pd.DataFrame(
+            columns = list_columns
+        )
 
-            ## Buscando informações na própria página de pesquisa da Gupy
+        ## Buscando informações na própria página de pesquisa da Gupy
 
-            df_aux.loc[0,'site_da_vaga'] = 'Gupy'
+        df_aux.loc[0,'site_da_vaga'] = 'Gupy'
 
-            df_aux.loc[0,'link_site'] = vaga.findAll('a')[0]['href']
+        df_aux.loc[0,'link_site'] = vaga.findAll('a')[0]['href']
 
-            df_aux.loc[0,'link_origem'] = vaga.findAll('a')[0]['href']
+        df_aux.loc[0,'link_origem'] = vaga.findAll('a')[0]['href']
 
-            df_aux.loc[0,'data_publicacao'] = vaga.findAll('p', {'class':'sc-dPyBCJ kyoAxx sc-1db88588-0 inqtnx'})[0].text
+        df_aux.loc[0,'data_publicacao'] = vaga.findAll('p', {'class':'sc-dPyBCJ kyoAxx sc-1db88588-0 inqtnx'})[0].text
 
-            df_aux.loc[0,'data_coleta'] = datetime.datetime.today().strftime('%Y-%m-%d')
+        df_aux.loc[0,'data_coleta'] = datetime.datetime.today().strftime('%Y-%m-%d')
 
-            df_aux.loc[0,'posicao'] = nome_vaga
+        df_aux.loc[0,'posicao'] = nome_vaga
 
-            df_aux.loc[0,'titulo_da_vaga'] = vaga.findAll('h2')[0].text
+        df_aux.loc[0,'titulo_da_vaga'] = vaga.findAll('h2')[0].text
 
-            df_aux.loc[0,'nome_empresa'] = vaga.findAll('p', {'class':'sc-dPyBCJ kyoAxx sc-a3bd7ea-6 cQyvth'})[0].text
+        df_aux.loc[0,'nome_empresa'] = vaga.findAll('p', {'class':'sc-dPyBCJ kyoAxx sc-a3bd7ea-6 cQyvth'})[0].text
 
-            try: 
-                df_aux.loc[0,'local'] = vaga.findAll('span', {'class',"sc-23336bc7-1 cezNaf"})[0].text
-            except:
-                df_aux.loc[0,'local'] = np.nan
+        try: 
+            df_aux.loc[0,'local'] = vaga.findAll('span', {'class',"sc-23336bc7-1 cezNaf"})[0].text
+        except:
+            df_aux.loc[0,'local'] = np.nan
+
+        try:
+            df_aux.loc[0,'modalidade'] = vaga.findAll('span', {'class',"sc-23336bc7-1 cezNaf"})[1].text
+        except:
+            df_aux.loc[0,'modalidade'] = np.nan
+
+        try:
+            df_aux.loc[0,'contrato'] = vaga.findAll('span', {'class',"sc-23336bc7-1 cezNaf"})[2].text
+        except:
+            df_aux.loc[0,'contrato'] = np.nan
+
+        df_aux.loc[0, 'regime'] = np.nan
+
+        try:
+            df_aux.loc[0,'pcd'] = vaga.findAll('span', {'class',"sc-23336bc7-1 cezNaf"})[3].text
+        except:
+            df_aux.loc[0,'pcd'] = np.nan
+
+        df_aux.loc[0,'beneficios'] = np.nan
+
+        ## Request da página da vaga
+
+        try:
+            response = requests.get(vaga.findAll('a')[0]['href']) # link da vaga
+            page = BeautifulSoup(response.text, 'html.parser')
 
             try:
-                df_aux.loc[0,'modalidade'] = vaga.findAll('span', {'class',"sc-23336bc7-1 cezNaf"})[1].text
-            except:
-                df_aux.loc[0,'modalidade'] = np.nan
-
-            try:
-                df_aux.loc[0,'contrato'] = vaga.findAll('span', {'class',"sc-23336bc7-1 cezNaf"})[2].text
-            except:
-                df_aux.loc[0,'contrato'] = np.nan
-
-            df_aux.loc[0, 'regime'] = np.nan
-
-            try:
-                df_aux.loc[0,'pcd'] = vaga.findAll('span', {'class',"sc-23336bc7-1 cezNaf"})[3].text
-            except:
-                df_aux.loc[0,'pcd'] = np.nan
-
-            df_aux.loc[0,'beneficios'] = np.nan
-
-            ## Request da página da vaga
-
-            try:
-                response = requests.get(vaga.findAll('a')[0]['href']) # link da vaga
-                page = BeautifulSoup(response.text)
-
-                try:
-                    lista_descricao_em_texto = [page.findAll('div', {'data-testid':'text-section'})[i].text for i in range(len(page.findAll('div', {'data-testid':'text-section'})))]
-                    descricao_completa = '\n'.join(lista_descricao_em_texto)
-                    df_aux.loc[0,'descricao'] = descricao_completa
-                except:
-                    df_aux.loc[0,'descricao'] = np.nan
-
-                try:
-                    df_aux.loc[0,'codigo_vaga'] = json.loads(page.findAll('script', {'id':'__NEXT_DATA__'})[0].get_text())['props']['pageProps']['job']['id']
-                except:
-                    df_aux.loc[0,'codigo_vaga'] = np.nan
-
-                try:
-                    df_aux.loc[0,'data_expiracao'] = json.loads(page.findAll('script', {'id':'__NEXT_DATA__'})[0].get_text())['props']['pageProps']['job']['expiresAt']
-                except:
-                    df_aux.loc[0,'data_expiracao'] = np.nan
+                lista_descricao_em_texto = [page.findAll('div', {'data-testid':'text-section'})[i].text for i in range(len(page.findAll('div', {'data-testid':'text-section'})))]
+                descricao_completa = '\n'.join(lista_descricao_em_texto)
+                df_aux.loc[0,'descricao'] = descricao_completa
             except:
                 df_aux.loc[0,'descricao'] = np.nan
+
+            try:
+                df_aux.loc[0,'codigo_vaga'] = json.loads(page.findAll('script', {'id':'__NEXT_DATA__'})[0].get_text())['props']['pageProps']['job']['id']
+            except:
                 df_aux.loc[0,'codigo_vaga'] = np.nan
+
+            try:
+                df_aux.loc[0,'data_expiracao'] = json.loads(page.findAll('script', {'id':'__NEXT_DATA__'})[0].get_text())['props']['pageProps']['job']['expiresAt']
+            except:
                 df_aux.loc[0,'data_expiracao'] = np.nan
-            
-            df_vagas = pd.concat([df_vagas, df_aux], axis=0, ignore_index=True)
-            
-        df_vagas = df_vagas.reset_index(drop=True)
+        except:
+            df_aux.loc[0,'descricao'] = np.nan
+            df_aux.loc[0,'codigo_vaga'] = np.nan
+            df_aux.loc[0,'data_expiracao'] = np.nan
+        
+        df_vagas = pd.concat([df_vagas, df_aux], axis=0, ignore_index=True)
+        
+    df_vagas = df_vagas.reset_index(drop=True)
 
-        df_vagas.to_excel(f'../data/data_raw/tmp/data_csv/{nome_vaga}_vagas_gupy.xlsx', index=False)
+    df_vagas.to_excel(f'../data/data_raw/tmp/data_csv/{nome_vaga}_vagas_gupy.xlsx', index=False)
 
-        return df_vagas
+    return df_vagas
 
 def busca_vagas(nome_vaga):
 
@@ -176,7 +176,7 @@ if __name__ == '__main__':
     for posicao in lista_posicoes:
         
         df_vagas_aux = busca_vagas(posicao)
-
+        
         df_vagas_full = pd.concat([df_vagas_full, df_vagas_aux], axis = 0)
         
     df_vagas_full.reset_index()
