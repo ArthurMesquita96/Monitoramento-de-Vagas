@@ -158,4 +158,4 @@ df_vagas = pd.read_excel('data/data_raw/vagas_vagas_raw.xlsx')
 
 df_vagas = clean_vagas_dataframe(df_vagas)
 
-df_vagas.to_excel('data/data_clean/vagas_vagas_clean.xlsx')
+df_vagas.to_excel('data/data_clean/vagas_vagas_clean.xlsx', index=False)

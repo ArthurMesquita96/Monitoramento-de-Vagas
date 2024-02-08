@@ -1,16 +1,16 @@
 import streamlit as st
 import pandas as pd
 
-data = pd.read_excel('data/data_clean/vagas_clean.xlsx')
+data = pd.read_excel('data/data_clean/vagas_vagas_clean.xlsx')
 
 
 st.markdown('# Levels')
 
-df_seniority = ( data[['senioridade', 'link']]
+df_seniority = ( data[['senioridade', 'link_site']]
                     .groupby('senioridade').count()
                     .reset_index()
-                    .sort_values('link', ascending=False)
-                    .rename(columns={'link': 'count'}) 
+                    .sort_values('link_site', ascending=False)
+                    .rename(columns={'link_site': 'count'}) 
             )
 
 st.bar_chart(data = df_seniority, x = 'senioridade', y = 'count')
