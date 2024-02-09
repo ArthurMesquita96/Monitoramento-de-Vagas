@@ -1,8 +1,32 @@
 import pandas    as pd
 import streamlit as st
+from PIL import Image
 
-data = pd.read_excel('data/data_clean/vagas_gupy_clean.xlsx')
+st.set_page_config(page_title='Vagas', page_icon='🔎', layout='wide')
 
+
+# =====================================================================================
+# Sidebar (Barra Lateral)
+# =====================================================================================
+
+st.sidebar.markdown('# Monitoramento de Vagas')
+st.sidebar.markdown('### Aqui você não perde nada!')
+
+cds_logo = Image.open('img/cds.png')
+st.sidebar.image(cds_logo, width=150)
+
+st.sidebar.markdown('''---''')
+
+powered_cds_logo = Image.open('img/comunidade_ds_logo.png')
+st.sidebar.image(powered_cds_logo, width=250)
+st.sidebar.markdown('### Powered by Comunidade DS')
+
+
+# =====================================================================================
+# Layout streamlit
+# =====================================================================================
+
+data = pd.read_excel('data/data_clean/vagas_vagas_clean.xlsx')
 
 st.markdown('# Vagas')
 
