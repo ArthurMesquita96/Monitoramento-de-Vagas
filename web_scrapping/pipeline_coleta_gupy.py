@@ -95,7 +95,7 @@ def coleta_dados_vagas(soup, nome_vaga):
 
         df_aux.loc[0,'posicao'] = nome_vaga
 
-        df_aux.loc[0,'titulo_da_vaga'] = vaga.findAll('h2')[0].text
+        df_aux.loc[0,'titulo_vaga'] = vaga.findAll('h2')[0].text
 
         df_aux.loc[0,'nome_empresa'] = vaga.findAll('p', {'class':'sc-dPyBCJ kyoAxx sc-a3bd7ea-6 cQyvth'})[0].text
 

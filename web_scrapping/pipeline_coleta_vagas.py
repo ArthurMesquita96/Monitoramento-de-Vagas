@@ -119,9 +119,9 @@ def get_job_opportunity_info(job_url: str, position: str) -> dict:
         job_info['data_publicacao'] = None
 
     try:
-        job_info['data_expiracao_vaga'] = request_json.get('validThrough')
+        job_info['data_expiracao'] = request_json.get('validThrough')
     except:
-        job_info['data_expiracao_vaga'] = None
+        job_info['data_expiracao'] = None
 
     
     job_info['data_coleta'] = datetime.today().strftime('%Y-%m-%d')
@@ -135,15 +135,15 @@ def get_job_opportunity_info(job_url: str, position: str) -> dict:
 
 
     try:
-        job_info['titulo_da_vaga'] = job_page.select('.job-shortdescription__title')[0].text.strip()
+        job_info['titulo_vaga'] = job_page.select('.job-shortdescription__title')[0].text.strip()
     except:
-        job_info['titulo_da_vaga'] = None
+        job_info['titulo_vaga'] = None
 
 
     try:
-        job_info['nome_da_empresa'] = job_page.select('.job-shortdescription__company')[0].text.strip()
+        job_info['nome_empresa'] = job_page.select('.job-shortdescription__company')[0].text.strip()
     except:
-        job_info['nome_da_empresa'] = None
+        job_info['nome_empresa'] = None
 
 
     try:
