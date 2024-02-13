@@ -119,7 +119,7 @@ selected_benefits = st.multiselect(
 df_filtered_benefits = filter_benefits(df_benefits, selected_benefits)
 
 
-st.dataframe(df_filtered_benefits[['titulo_da_vaga', 'data_publicacao', 'senioridade', 'estado', 'modalidade', 'link_site']])
+st.dataframe(df_filtered_benefits[['titulo_vaga', 'data_publicacao', 'senioridade', 'estado', 'modalidade', 'link_site']])
 
 
 
