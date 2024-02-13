@@ -176,7 +176,7 @@ st.sidebar.markdown('### Powered by Comunidade DS')
 # =====================================================================================
 
 
-df_raw = pd.read_excel('data/data_clean/vagas_vagas_clean.xlsx')
+df_raw = pd.read_excel('data/data_refined/vagas_full.xlsx')
 
 
 st.markdown('# Overview')

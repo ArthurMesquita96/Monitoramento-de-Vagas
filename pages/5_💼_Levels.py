@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
 
-data = pd.read_excel('data/data_clean/vagas_vagas_clean.xlsx')
+data = pd.read_excel('data/data_refined/vagas_full.xlsx')
 
 
 st.markdown('# Levels')

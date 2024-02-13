@@ -100,7 +100,7 @@ def plot_bar_graph(data: pd.DataFrame, top_benefits: int) -> None:
 st.markdown('# Benefícios')
 
 
-df_raw = pd.read_excel('data/data_clean/vagas_vagas_clean.xlsx')
+df_raw = pd.read_excel('data/data_refined/vagas_full.xlsx')
 
 benefits = list( get_benefits_list(df_raw) )
 benefits.sort()
