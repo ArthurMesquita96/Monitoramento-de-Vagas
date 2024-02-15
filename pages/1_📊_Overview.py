@@ -176,7 +176,7 @@ st.sidebar.markdown('### Powered by Comunidade DS')
 # =====================================================================================
 
 
-df_raw = pd.read_excel('data/data_clean/vagas_vagas_clean.xlsx')
+df_raw = pd.read_excel('data/data_refined/vagas_full.xlsx')
 
 
 st.markdown('# Overview')
@@ -212,7 +212,7 @@ with gupy_tab:
         st.markdown('## Plataforma')
         st.image('img/gupy_logo.png', width=200)
 
-        df_platform = platform_job_position_count(df_raw, 'Vagas.com')
+        df_platform = platform_job_position_count(df_raw, 'Gupy')
         st.dataframe(df_platform)
         
     with cols[1]:

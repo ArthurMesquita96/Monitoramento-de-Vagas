@@ -26,7 +26,7 @@ st.sidebar.markdown('### Powered by Comunidade DS')
 # Layout streamlit
 # =====================================================================================
 
-data = pd.read_excel('data/data_clean/vagas_vagas_clean.xlsx')
+data = pd.read_excel('data/data_refined/vagas_full.xlsx')
 
 st.markdown('# Vagas')
 

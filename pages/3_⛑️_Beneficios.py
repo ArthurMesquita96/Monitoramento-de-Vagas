@@ -100,7 +100,7 @@ def plot_bar_graph(data: pd.DataFrame, top_benefits: int) -> None:
 st.markdown('# Benefícios')
 
 
-df_raw = pd.read_excel('data/data_clean/vagas_vagas_clean.xlsx')
+df_raw = pd.read_excel('data/data_refined/vagas_full.xlsx')
 
 benefits = list( get_benefits_list(df_raw) )
 benefits.sort()
@@ -119,7 +119,7 @@ selected_benefits = st.multiselect(
 df_filtered_benefits = filter_benefits(df_benefits, selected_benefits)
 
 
-st.dataframe(df_filtered_benefits[['titulo_da_vaga', 'data_publicacao', 'senioridade', 'estado', 'modalidade', 'link_site']])
+st.dataframe(df_filtered_benefits[['titulo_vaga', 'data_publicacao', 'senioridade', 'estado', 'modalidade', 'link_site']])
 
 
 
