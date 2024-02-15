@@ -212,7 +212,7 @@ with gupy_tab:
         st.markdown('## Plataforma')
         st.image('img/gupy_logo.png', width=200)
 
-        df_platform = platform_job_position_count(df_raw, 'Vagas.com')
+        df_platform = platform_job_position_count(df_raw, 'Gupy')
         st.dataframe(df_platform)
         
     with cols[1]:
