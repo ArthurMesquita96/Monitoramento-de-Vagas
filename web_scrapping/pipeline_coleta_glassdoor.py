@@ -2,164 +2,286 @@ import csv
 import json
 import os
 from datetime import datetime
+from random import randint
 from time import sleep
 
+import psutil
+from bs4 import BeautifulSoup
 from selenium import webdriver
-from selenium.common.exceptions import TimeoutException
+from selenium.common.exceptions import (StaleElementReferenceException,
+                                        TimeoutException)
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
-from webdriver_manager.chrome import ChromeDriverManager
+from webdriver_manager.chrome import ChromeDriverManager, ChromeType
 
 
-def find_key_recursive(dictionary, target_key):
-    for key, value in dictionary.items():
-        if key == target_key:
-            return value
-        elif isinstance(value, dict):
-            result = find_key_recursive(value, target_key)
-            if result is not None:
-                return result
-    return None
+class JobScraper:
 
-def escrever_csv(linha):
-    file_exists = os.path.isfile('dados.csv')
+    job_titles = ['Cientista de Dados',
+                  'Engenheiro de Dados', 'Analista de Dados']
 
-    with open('glassdoor.csv', 'a', newline='') as file:
-        fieldnames = list(linha.keys())
-        writer = csv.DictWriter(file, fieldnames=fieldnames)
+    def __init__(self, job_titles, site_name) -> None:
+        self.job_titles: list = job_titles
+        self.site_name: str = site_name
+        self.driver = self.__iniciar_selenium()
 
-        if not file_exists:
-            writer.writeheader()
+    def __iniciar_selenium(self, headless=False):
+        my_agent = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+        options = webdriver.ChromeOptions()
+        options.add_argument(f"user-agent={my_agent}")
+        options.add_argument("--lang=pt-BR")
+        options.add_argument('--disable-dev-shm-usage')
+        options.add_argument("--incognito")
+        options.add_argument('--disable-blink-features=AutomationControlled')
 
-        writer.writerow(linha)
+        if headless:
+            options.add_argument('--headless')
+
+        service = Service(ChromeDriverManager().install())
+        driver = webdriver.Chrome(
+            options=options, service=service)
+
+        return driver
+
+    def save_csv(self, linha):
+
+        filename = self.site_name.lower() + '.csv'
+
+        file_exists = os.path.isfile(filename)
+
+        with open(filename, 'a', newline='') as file:
+            fieldnames = list(linha.keys())
+            writer = csv.DictWriter(file, fieldnames=fieldnames)
+
+            if not file_exists:
+                writer.writeheader()
+
+            writer.writerow(linha)
+
+    def scrape_jobs(self):
+        pass
 
 
-cookie = {"name": "at", "value": "lZSwvBfP1zAnSADH5mRoQAAQRMMQ9ttnOw5znTxmYP5mbNImuimeItwVjr9jLMIUR93mjQgt_7hQyyqnPHJ8mL_Ir587qJOB3uiQS61elbrxzdwQW6WiO5fj3NhY6wYjsN3ZCfQKlX6-x_Bw-p9EuO0NlZChgi1xmcXMqDPQzW-eUaM54G0H49ch3gC-jkfdCG-HU4Kx-Ng_pDPbFytdVn13pCnVI2L_5cH1PT0Z9vMfDEBbqf2qTKpzWrkwXPAqPxGekUBMwCjix5ZzJ--HTRBxXpTduCXdrk4phP__7qG0xt2GWfogVkP5xL1KOQ3GACtSihN4uEkZ0bJL9EUfAoX0YiaS15cAXw7NfHa8t7O5ygEVlyrzPBc9UlNdVDVuTcv-wkStwPg_Ldxh_Fq1sXb6ruDcccr1NqKWDJU1ZMT9pAS6KbT0lKnlf9q8p4-5buQqOWLwkosWbBXEAikUyXdSGV0cNOAXsiWJXiUQIReF6AoILQ7O3XZy0Em2i1cAmLVtTaBTut6SXGcPH8XyXUAGRID0cauPmddtnY5d7tF9rVm6er_vKiF8ZPvBg2i9xQza8tlbgtG8dEuq62GudrGFySpLTgxGIRkD-aHpAyq9Ca-hDoezI89sV5rp8AgMnFgY-3KX64mbNmoUc2LmGUg_qBubzoqvgRcPqt0EMnj_j7x5c8gkbYpdN-lFzCzZimScu1cXUkgCcvjbIDGbdO79x5unwk_SWEiE2iLhyhxrLgMZ-0eYeo3gcWtTZXJvUHrp4_ofHlet2inVMYSt2tYI9I3VYgFe1JQxpQkkmRr8pb8Cm7E2IJeIe6mmRfAfVaEoS5A5jC1FFpEkI8HQnTfwF6nd2_rhMjBoEIk_DiDJt0Kdc-Yl60qh"}
+class GlassdoorScraper(JobScraper):
 
+    def __init__(self, site_name) -> None:
+        super().__init__(site_name, 'Glassdoor')
+        self.cookie = {"name": "at", "value": "Vffs0MlCIDEfflQ11OInCvejLSP2LJcus1xBWozC4laeA4Xfzb6pv7qDZ_nwxqGx8vddl85T-AGlsgrFvWOm3fmwDp5hZoRrXCoQlk2Xvune7iwSoRLLsAB3X0SorZbu9v_SHQtJ3TH-8DeJGhIUNDFe7nbcqLIDnERzKYMblmuGV7vjGilr4kCHdQsm_TxJu2t9KW2a10gCKYDmmtefQp3RY5JaWyGuy1rFiAbYDs3OnryED52XCKCW-gcOGwrz1mHg6DWAqo87ZwLESUOWplI6L8WSW-F2-K9Z199grBuAb3MLwFokvYoBjWrS8EwgcF0w_cpo3rX9zifSNrvXyp5aFjLXX6gqwbGx5DCikwD423oWNinJ1GC-pZVni0VNPpcJaAy6aIPehY9E0n1c-Fj64lSudtDotmVv1vc5Y7DYjGyCdq2OI24rwf_8We9hupYU9R_45EN869hsAmc57uAG1OXm_AoRH93wbxMxfZSPa2ZBubcFr6UWeGOWM0JLifZjn5ZPmRqBLvNBhfk0V6H9zBsIB8glha60m73wEIBDnxjBc6ysk0JUj6ngOEA9ULt6vtV1_i9dzm3sw4nDaPlJNE7bFNAWX1o0j76pjHRr4ZzWjr52MnqlqcLE3AkMtsStwFGPOjwOny01p-JwXnR7AfmS3dzPgOBdWiDtt-uIATlpy00nZO6azbxMATcPtLj--nrciT6pfzwIUpcMg45SEgbI4qiQnH9RAgw3BiEgXrXDruDhWAdljwePDGJb7GwHUkYGBcgWIqsxah2tRHafGKoBEDLPMV8__Nknbr-OJ-2ppMnCK1jPuR7r9viJUHVEdyCrwpszdwYDe2dvlsGNtIYbDbSGdVk_LaiZscvWdK0EVyHliqxxPQ"}
 
-my_agent = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+    def pesquisa_chave(self, dictionario, chave):
+        for key, value in dictionario.items():
+            if key == chave:
+                return value
+            elif isinstance(value, dict):
+                result = self.pesquisa_chave(value, chave)
+                if result is not None:
+                    return result
+        return None
 
-options = webdriver.ChromeOptions()
-options.add_argument(f"user-agent={my_agent}")
-options.add_argument("--lang=pt-BR")
+    def clean_tags(self, text):
 
-service = Service(ChromeDriverManager().install())
+        soup = BeautifulSoup(text, 'html.parser')
+        clean_text = soup.get_text()
+        return clean_text
 
-driver = webdriver.Chrome(options=options, service=service)
-driver.get('https://www.glassdoor.com.br/Vaga/index.htm')
+    def __get_job_urls(self, xpath):
 
-driver.add_cookie(cookie)
+        job_elements = self.driver.find_elements('xpath', xpath)
 
-driver.refresh()
+        job_urls = []
 
-wait = WebDriverWait(driver, 20)
+        for element in job_elements:
+            href = element.get_attribute('href')
+            if href:
+                job_urls.append(href)
 
-barra_pesquisa = driver.find_element(
-    'xpath', '//input[@id="searchBar-jobTitle"]')
+        return job_urls
 
-barra_pesquisa.send_keys('Cientista de Dados')
-barra_pesquisa.send_keys(Keys.ENTER)
+    def __verify_json(self) -> bool:
 
-sleep(3)
+        wait = WebDriverWait(self.driver, 50)
 
-qnt_vagas = driver.find_element(
-    'xpath',
-    '//h1[@data-test="search-title"]'
-).get_attribute('innerHTML').split()[0]
-
-while True:
-    sleep(1)
-
-    try:
-        load_button = wait.until(
+        wait.until(
             EC.presence_of_element_located(
                 (By.XPATH,
-                 '//button[@data-test="load-more"]')
+                 '//script[contains(text(), "props")]')
             )
         )
-        load_button.click()
 
-    except TimeoutException:
-        continue
+        script_tag = self.driver.find_element(
+            'xpath', '//script[contains(text(), "props")]'
+        ).get_attribute('innerHTML')
+        data = json.loads(script_tag)
+        job_json = self.pesquisa_chave(data, 'job')
+        header_json = self.pesquisa_chave(data, 'header')
 
-    try:
-        wait.until(
-            EC.element_to_be_clickable(
-                (By.CSS_SELECTOR,
-                 'button[data-test="load-more"][data-loading="false"]')
-            )
+        if job_json is None or header_json is None:
+            return True
+
+        return False
+
+    def __iniciar_selenium(self, headless=False):
+        my_agent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36'
+        options = webdriver.ChromeOptions()
+        options.add_argument(f"user-agent={my_agent}")
+        options.add_argument("--lang=pt-BR")
+        options.add_argument('--disable-dev-shm-usage')
+
+        if headless:
+            options.add_argument('--headless')
+
+        service = Service(
+            ChromeDriverManager().install()
         )
-    except TimeoutException:
-        continue
+        driver = webdriver.Chrome(
+            options=options, service=service)
 
-    job_urls = driver.find_elements(
-        'xpath',
-        './/a[contains(@id, "job-title")]'
-    )
+        return driver
 
-    if len(job_urls) >= int(qnt_vagas):
-        break
+    def scrape_jobs(self):
 
-for url in job_urls:
-    link = url.get_attribute('href')
+        for job_title in self.job_titles:
 
-    while True:
+            self.driver.get('https://www.glassdoor.com.br/Vaga/index.htm')
+            self.driver.add_cookie(self.cookie)
+            self.driver.refresh()
 
-        driver.execute_script(f"window.open('{link}', '_blank');")
-
-        try:
-            wait.until(
-                lambda driver: driver.execute_script(
-                    "return document.readyState") == "complete"
-            )
-
-            driver.switch_to.window(driver.window_handles[1])
+            wait = WebDriverWait(self.driver, 50)
 
             wait.until(
                 EC.presence_of_element_located(
-                    (By.XPATH,
-                     '//script[contains(text(), "props")]')
+                    (By.XPATH, '//input[@id="searchBar-jobTitle"]')
                 )
             )
-            break
-        except TimeoutException:
-            driver.close()
-            driver.switch_to.window(driver.window_handles[0])
-            continue
 
-    script_tag = driver.find_element(
-        'xpath',
-        '//script[contains(text(), "props")]'
-    ).get_attribute('innerHTML')
+            barra_pesquisa = self.driver.find_element(
+                'xpath', '//input[@id="searchBar-jobTitle"]')
+            barra_pesquisa.send_keys(job_title)
+            barra_pesquisa.send_keys(Keys.ENTER)
 
-    data = json.loads(script_tag)
+            sleep(3)
 
-    job_json = find_key_recursive(data, 'job')
-    header_json = find_key_recursive(data, 'header')
+            qnt_vagas = self.driver.find_element(
+                'xpath',
+                '//h1[@data-test="search-title"]').get_attribute(
+                    'innerHTML').split()[0]
 
-    dados = {
-        'site_da_vaga': 'Glassdoor',
-        'link': link,
-        'data_publicacao': datetime.strptime(
-            job_json['discoverDate'], '%Y-%m-%dT%H:%M:%S').date(),
-        'data_coleta': datetime.now().date(),
-        'titulo_da_vaga': header_json['jobTitleText'],
-        'local': header_json['locationName'],
-        'modalidade': '',
-        'contrato': '',
-        'acessibilidade': '',
-        'nome_empresa': header_json['employerNameFromSearch'],
-        'codigo_vaga': job_json['listingId'],
-        'descricao': job_json['description']
-    }
+            while True:
+                sleep(1)
+                try:
+                    load_button = wait.until(
+                        EC.presence_of_element_located(
+                            (By.XPATH, '//button[@data-test="load-more"]')
+                        )
+                    )
+                    load_button.click()
 
-    escrever_csv(dados)
+                    wait.until(
+                        EC.element_to_be_clickable(
+                            (By.CSS_SELECTOR,
+                             'button[data-test="load-more"][data-loading="false"]')
+                        )
+                    )
+                except (TimeoutException, StaleElementReferenceException):
+                    continue
 
-    driver.close()
+                qnt_jobs = len(self.driver.find_elements(
+                    'xpath', './/a[contains(@id, "job-title")]'))
 
-    driver.switch_to.window(driver.window_handles[0])
+                if qnt_jobs >= int(qnt_vagas):
+                    job_urls = self.__get_job_urls(
+                        './/a[contains(@id, "job-title")]')
+                    self.driver.refresh()
+                    break
 
-sleep(10)
+            self.driver.quit()
+            sleep(3)
+
+            self.driver = self.__iniciar_selenium(False)
+
+            for url in job_urls:
+
+                self.driver.get(url)
+                sleep(3)
+
+                try:
+                    i = 0
+                    while True:
+
+                        if not self.__verify_json():
+                            break
+                        elif i == 10:
+                            self.driver.refresh()
+                            sleep(5)
+
+                        i += 1
+
+                    if self.__verify_json():
+                        self.driver.refresh()
+                        wait.until(
+                            lambda driver: driver.execute_script(
+                                "return document.readyState") == "complete"
+                        )
+
+                    script_tag = self.driver.find_element('xpath', '//script[contains(text(), "props")]').get_attribute(
+                        'innerHTML')
+                    data = json.loads(script_tag)
+                    job_json = self.pesquisa_chave(data, 'job')
+                    header_json = self.pesquisa_chave(data, 'header')
+                    map_json = self.pesquisa_chave(data, 'map')
+                    modalidade = self.driver.find_element(
+                        'xpath', '//div[@data-test="location"]').text.lower()
+
+                except (TimeoutException, StaleElementReferenceException):
+                    self.driver.close()
+                    continue
+
+                try:
+                    dados = {
+                        'site_da_vaga': self.site_name,
+                        'link_site': url,
+                        'link_origem': 'www.glassdoor.com.br/Vaga/index.htm'
+                        + header_json['applyUrl'],
+                        'data_publicacao': datetime.strptime(job_json['discoverDate'], '%Y-%m-%dT%H:%M:%S').date(),
+                        'data_expiracao': '',
+                        'data_coleta': datetime.now().date(),
+                        'posicao': (
+                            header_json['normalizedJobTitle']
+                        ).capitalize(),
+                        'senioridade': '',
+                        'titulo_da_vaga': header_json['jobTitleText'],
+                        'nome_empresa': header_json['employerNameFromSearch'],
+                        'cidade': map_json['cityName'],
+                        'estado': map_json['stateName'],
+                        'modalidade': modalidade
+                        if 'remoto' in modalidade else '',
+                        'contrato': '',
+                        'regime': '',
+                        'pcd': '',
+                        'codigo_vaga': job_json['listingId'],
+                        'descricao': self.clean_tags(job_json['description']),
+                        'skills': header_json['indeedJobAttribute']['skillsLabel']
+                    }
+                except TypeError:
+                    continue
+
+                self.save_csv(dados)
+
+                sleep(randint(1, 20))
+            sleep(10)
+            self.driver.quit()
+
+
+def main():
+    job_titles = ['Cientista de Dados', 'Analista de Dados',
+                  'Engenheiro de Dados']
+
+    scraper = GlassdoorScraper(job_titles)
+    scraper.scrape_jobs()
+
+
+if __name__ == '__main__':
+    main()
