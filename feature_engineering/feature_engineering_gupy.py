@@ -28,7 +28,6 @@ def busca_senioridade(titulo_vaga: str, match_list: list[str]) -> bool:
     
     return senioridade
 
-
 def get_benefits_list(description: str) -> list[str] | None:
     """Obtém a lista de benefícios a partir da descrição da vaga
 
@@ -80,7 +79,6 @@ def get_benefits_list(description: str) -> list[str] | None:
     
     except:
         return None
-    
 
 def replace_va_vr_substrings(benefits_str: str) -> str:
     """Verifica se as substrings VA e/ou VR estão dentro string de benefícios e substitui
@@ -109,7 +107,6 @@ def replace_va_vr_substrings(benefits_str: str) -> str:
             benefits_str = benefits_str.replace(va_vr_short, va_vr_full)
 
     return benefits_str
-
 
 def format_benefits_list(benefit_list: list[str]) -> list[str] | None:
     """Padroniza os elementos da lista de beneficios.
@@ -159,11 +156,15 @@ def format_benefits_list(benefit_list: list[str]) -> list[str] | None:
     except:
         return None
 
-
 # Loading Dataframe
 df_gupy = pd.read_excel('data/data_raw/vagas_gupy_raw.xlsx')
 
 df_vagas = pd.concat([df_gupy], axis=0)
+
+## Tratamento de Dados
+df_vagas['data_publicacao'] = df_vagas['data_publicacao'].apply(lambda x: datetime.strptime(x.replace('Publicada em: ', '').replace('/', '-'),'%d-%m-%Y').strftime('%Y-%m-%d'))
+df_vagas['data_coleta'] = df_vagas['data_coleta']
+df_vagas['pcd'] = df_vagas['pcd'].apply(lambda x: 'Sim' if x == 'Também p/ PcD' else 'Não informado')
 
 
 # Senioridade
@@ -246,23 +247,112 @@ benefit_map = {
     'Vale-transporte':                       ['transporte'],
 }
 
+df_vagas['beneficios'] = df_vagas['descricao'].apply( lambda descricao: format_benefits_list(get_benefits_list(descricao)) )
 
-df_vagas['beneficios'] = df_vagas['descricao'].apply( lambda descricao: get_benefits_list(descricao) )
-df_vagas['beneficios'] = df_vagas['beneficios'].apply( lambda beneficios: format_benefits_list(beneficios) )
+## Skills
 
+def get_skills_list(description: str) -> list[str] | None:
 
-# Data publicação
+    try:
+        # na gupy a descricao geralmente é dividida em 4 seções: 0 -> 'JOB DESCRIPTION';                 1 -> 'RESPONSIBILITIES AND ASSIGNMENTS';
+        #                                                        2 -> 'REQUIREMENTS AND QUALIFICATIONS'; 3 -> 'ADDITIONAL INFORMATION'
+        # a lista de beneficios geralmente esta contida na seção 'ADDITIONAL INFORMATION' (existem alguns casos que isso não é verdade)
+        
+        # divide a descricao em seções
+        skills_sections = description.split('\n')
+        
+        # obtem o indice da seção 'ADDITIONAL INFORMATION' (geralmente é o terceiro indice mas existem paginas com menos seções)
+        index_benefit = [ True if 'Requisitos e qualificações' in section else False for section in skills_sections ].index( True )
 
-df_vagas['data_publicacao'] = df_vagas['data_publicacao'].apply( lambda x: 
-                                                                datetime.strptime(x.replace('Publicada em: ', '').replace('/', '-'), '%d-%m-%Y')
-                                                                .strftime('%Y-%m-%d')
-                                                            )
+        # seleciona a seção 'ADDITIONAL INFORMATION'
+        skills_str = skills_sections[index_benefit]
 
-# PCD
+        # substitui multiplos espaços em sequência por apenas um
+        skills_str = re.sub(r'\s+', ' ', skills_str)
 
-df_vagas['pcd'] = df_vagas['pcd'].apply(lambda x: 'Sim' if x == 'Também p/ PcD' else 'Não informado')
+        # adiciona um ponto-virgula ou ')' onde uma letra maiuscula é antecida por uma minuscula, precisamos dessa condição porque
+        # em muitos casos não existe um caracter utilizado para deixar clara separação entre os benefícios dentro da string; nessa
+        # situação, os beneficios estarão colados uns aos outros e a unica forma de diferenciá-los são os caracteres maiusculos.
+        skills_str = re.sub(r'(?<=[a-z]|\))([A-Z])', r';\1', skills_str)  # Exemplo:  Gympass(ilimitado)Vale-TransporteConvenio
+                                                                            #        -> Gympass(ilimitado);Vale-Transporte;Convenio
+        
+        # cria uma lista com substrings contendo uma letra maiúscula precedida e antecedida por um entre: ':', ';', '.', '•', '*'
+        # esses simbolos geralmente antecedem / procedem os elementos da lista de beneficios dentro da string.
+        skills_list = re.findall(r'(?:(?<=[\:\;\.\•\*]).*?[A-Z].*?(?=[\.\;\•\*\)]))', skills_str, flags=re.I)   # Exemplos: '* Gympass;' -> 'Gympass'
+                                                                                                                #             '• PLR.'     -> 'PLR'
+        
+        # remove espaços vazios no final e inicio de cada elemento da lista
+        skills_list = list( map( lambda skill: skill.strip(), skills_list ) )
 
+        return skills_list
+    
+    except:
+        return None
+    
+def replace_specifics_substrings(benefits_str: str) -> str:
 
+    va_vr_matches = re.findall(r'V[R|A]\b', benefits_str)
+
+    va_vr_map = zip(['Vale refeição', 'Vale alimentação'], ['VR', 'VA'])
+
+    for va_vr_full, va_vr_short in va_vr_map:
+
+        if va_vr_short in va_vr_matches:
+            benefits_str = benefits_str.replace(va_vr_short, va_vr_full)
+
+    return benefits_str
+
+def format_skills_list(skills_list: list[str], skills_map: dict[str:list]) -> list[str] | None:
+
+    try:
+        skills_list_formatted = []
+
+        # junta os beneficios em uma string separada por vírgula e espaço
+        skills_str = ', '.join(skills_list)
+
+        # # substitui as substrings 'VA' / 'VR' por 'Vale alimentação' / 'Vale refeição'
+        skills_str = replace_specifics_substrings(skills_str)
+
+        # remove acentos e deixa a string em lowercase
+        skills_str = unidecode(skills_str).lower()
+
+        for skills_key, skills_matches in skills_map.items():
+
+            # verifica se o beneficio está presente dentro da string
+            match_look = any( True if skill_word in skills_str else False for skill_word in skills_matches )
+
+            if match_look:
+                skills_list_formatted.append(skills_key)
+            else:
+                continue
+        
+        # se nenhum match é encontrado retona 'None' ao invés de uma lista vazia
+        if len(skills_list_formatted) == 0:
+            return None
+
+        return skills_list_formatted
+    
+    except:
+        return None
+
+skills_map = {
+    'Power BI': ['power bi', 'pbi', 'powerbi'],
+    'Python': ['python', 'phython'],
+    'SQL':['sql'],
+    'No-SQL':['no sql'],
+    'Pacote Office': ['pacite office', 'office'],
+    'Excel': ['excel'],
+    'Tableau':['tableau'],
+    'Clickview': ['clickview']
+}
+
+df_vagas['skills'] = df_vagas['descricao'].apply(lambda descricao: format_skills_list(get_skills_list(descricao), skills_map))
+
+## Contrato
+df_vagas['contrato'] = df_vagas['contrato'].apply(lambda x: 'Autônomo' if x == 'Pessoa Jurídica' else x )
+
+## Regime
+df_vagas['regime'] = df_vagas['contrato'].apply(lambda x: 'PJ' if x == 'Autônono' else 'CLT')
 
 # Save Dataframe
 
@@ -284,6 +374,7 @@ columns_selected = [
             'regime',
             'pcd',
             'beneficios',
+            'skills',
             'codigo_vaga',
             'descricao'
 ]
