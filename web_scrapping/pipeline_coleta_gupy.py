@@ -156,7 +156,7 @@ def coleta_dados_vagas(soup, nome_vaga):
 
     nome_vaga = nome_vaga.replace(' ', '_').lower()
 
-    df_vagas.to_excel(f'../data/data_raw/tmp/data_csv/{nome_vaga}_gupy.xlsx', index=False)
+    # df_vagas.to_excel(f'../data/data_raw/tmp/data_csv/{nome_vaga}_gupy.xlsx', index=False)
 
     return df_vagas
 
@@ -183,4 +183,4 @@ if __name__ == '__main__':
         
     df_vagas_full.reset_index()
 
-    df_vagas_full.to_excel('../data/data_raw/vagas_gupy_raw.xlsx', index=False)
+    df_vagas_full.to_excel('data/data_raw/vagas_gupy_raw.xlsx', index=False)
