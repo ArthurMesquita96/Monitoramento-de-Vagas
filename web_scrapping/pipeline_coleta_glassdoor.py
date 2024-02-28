@@ -49,8 +49,10 @@ class JobScraper:
     def save_csv(self, linha):
 
         filename = self.site_name.lower() + '.csv'
+        diretorio = '../data/data_raw/'
 
-        file_exists = os.path.isfile(filename)
+        filepath = os.path.join(diretorio, filename)
+        file_exists = os.path.isfile(filepath)
 
         with open(filename, 'a', newline='') as file:
             fieldnames = list(linha.keys())
@@ -91,12 +93,13 @@ class GlassdoorScraper(JobScraper):
 
         job_elements = self.driver.find_elements('xpath', xpath)
 
-        job_urls = []
+        job_urls = dict()
 
         for element in job_elements:
             href = element.get_attribute('href')
+            job_id = href.split('=')[-1]
             if href:
-                job_urls.append(href)
+                job_urls[job_id] = href
 
         return job_urls
 
@@ -141,9 +144,28 @@ class GlassdoorScraper(JobScraper):
 
         return driver
 
-    def scrape_jobs(self):
+    def __create_json(self, dictionary, filepath):
+
+        if os.path.exists(filepath):
+
+            with open(filepath, 'r') as f:
+                dados_json = json.load(f)
+
+                for chave in dictionary:
+                    if chave not in dados_json:
+                        dados_json.update(dictionary)
+
+        else:
+            dados_json = dictionary
+
+        with open(filepath, 'w') as f:
+            json.dump(dados_json, f, indent=4)
+
+    def __get_links(self):
 
         for job_title in self.job_titles:
+
+            self.driver = self.__iniciar_selenium(False)
 
             self.driver.get('https://www.glassdoor.com.br/Vaga/index.htm')
             self.driver.add_cookie(self.cookie)
@@ -164,13 +186,24 @@ class GlassdoorScraper(JobScraper):
 
             sleep(3)
 
+            try:
+                close_modal = self.driver.find_element(
+                    'xpath', '//span[@class="SVGInline modal_closeIcon"]')
+
+                close_modal.click()
+            except StaleElementReferenceException:
+                pass
+
             qnt_vagas = self.driver.find_element(
                 'xpath',
                 '//h1[@data-test="search-title"]').get_attribute(
-                    'innerHTML').split()[0]
+                    'innerHTML').split()[0].replace('.', '')
+
+            i = 0
 
             while True:
                 sleep(1)
+
                 try:
                     load_button = wait.until(
                         EC.presence_of_element_located(
@@ -185,94 +218,127 @@ class GlassdoorScraper(JobScraper):
                              'button[data-test="load-more"][data-loading="false"]')
                         )
                     )
-                except (TimeoutException, StaleElementReferenceException):
+                except TimeoutException:
+                    if i == 5:
+                        break
+
+                    i += 1
                     continue
 
                 qnt_jobs = len(self.driver.find_elements(
                     'xpath', './/a[contains(@id, "job-title")]'))
 
-                if qnt_jobs >= int(qnt_vagas):
-                    job_urls = self.__get_job_urls(
+                if qnt_jobs >= int(qnt_vagas) or \
+                        int(qnt_vagas) - qnt_jobs > 10:
+                    filepath = '/home/artbdr/Documents/repos/Monitoramento-de-Vagas/data/data_raw/tmp/glassdoor.json'
+
+                    links_json = self.__get_job_urls(
                         './/a[contains(@id, "job-title")]')
-                    self.driver.refresh()
+                    self.__create_json(links_json, filepath)
                     break
 
             self.driver.quit()
-            sleep(3)
 
-            self.driver = self.__iniciar_selenium(False)
+    def get_json_file(self, filepath):
+        with open(filepath, 'r') as file:
+            dados_json = json.load(file)
 
-            for url in job_urls:
+        return dados_json
 
-                self.driver.get(url)
+    def scrape_jobs(self):
+
+        self.__get_links()
+
+        sleep(3)
+
+        job_urls = self.get_json_file(
+            '/home/artbdr/Documents/repos/Monitoramento-de-Vagas/data/data_raw/tmp/glassdoor.json')
+
+        urls_processadas = 0
+
+        for url in job_urls.values():
+
+            if urls_processadas % 25 == 0:
+
+                memory_use = psutil.virtual_memory().used / (1024 * 1024)
+                print(f"Uso de memória: {memory_use:.2f} MB")
+
+                if self.driver is not None:
+                    self.driver.quit()
+                    sleep(3)
+                    self.driver = self.__iniciar_selenium(False)
                 sleep(3)
 
-                try:
-                    i = 0
-                    while True:
+            self.driver.get(url)
+            sleep(3)
 
-                        if not self.__verify_json():
-                            break
-                        elif i == 10:
-                            self.driver.refresh()
-                            sleep(5)
+            try:
+                i = 0
+                while True:
 
-                        i += 1
-
-                    if self.__verify_json():
+                    if not self.__verify_json():
+                        break
+                    elif i == 10:
                         self.driver.refresh()
-                        wait.until(
-                            lambda driver: driver.execute_script(
-                                "return document.readyState") == "complete"
-                        )
+                        sleep(5)
 
-                    script_tag = self.driver.find_element('xpath', '//script[contains(text(), "props")]').get_attribute(
-                        'innerHTML')
-                    data = json.loads(script_tag)
-                    job_json = self.pesquisa_chave(data, 'job')
-                    header_json = self.pesquisa_chave(data, 'header')
-                    map_json = self.pesquisa_chave(data, 'map')
-                    modalidade = self.driver.find_element(
-                        'xpath', '//div[@data-test="location"]').text.lower()
+                    i += 1
 
-                except (TimeoutException, StaleElementReferenceException):
-                    self.driver.close()
-                    continue
+                if self.__verify_json():
+                    self.driver.refresh()
+                    wait.until(
+                        lambda driver: driver.execute_script(
+                            "return document.readyState") == "complete"
+                    )
 
-                try:
-                    dados = {
-                        'site_da_vaga': self.site_name,
-                        'link_site': url,
-                        'link_origem': 'www.glassdoor.com.br/Vaga/index.htm'
-                        + header_json['applyUrl'],
-                        'data_publicacao': datetime.strptime(job_json['discoverDate'], '%Y-%m-%dT%H:%M:%S').date(),
-                        'data_expiracao': '',
-                        'data_coleta': datetime.now().date(),
-                        'posicao': (
-                            header_json['normalizedJobTitle']
-                        ).capitalize(),
-                        'senioridade': '',
-                        'titulo_da_vaga': header_json['jobTitleText'],
-                        'nome_empresa': header_json['employerNameFromSearch'],
-                        'cidade': map_json['cityName'],
-                        'estado': map_json['stateName'],
-                        'modalidade': modalidade
-                        if 'remoto' in modalidade else '',
-                        'contrato': '',
-                        'regime': '',
-                        'pcd': '',
-                        'codigo_vaga': job_json['listingId'],
-                        'descricao': self.clean_tags(job_json['description']),
-                        'skills': header_json['indeedJobAttribute']['skillsLabel']
-                    }
-                except TypeError:
-                    continue
+                script_tag = self.driver.find_element('xpath', '//script[contains(text(), "props")]').get_attribute(
+                    'innerHTML')
+                data = json.loads(script_tag)
+                job_json = self.pesquisa_chave(data, 'job')
+                header_json = self.pesquisa_chave(data, 'header')
+                map_json = self.pesquisa_chave(data, 'map')
+                modalidade = self.driver.find_element(
+                    'xpath', '//div[@data-test="location"]').text.lower()
 
-                self.save_csv(dados)
+            except (TimeoutException, StaleElementReferenceException):
+                self.driver.close()
+                continue
 
-                sleep(randint(1, 20))
-            sleep(10)
-            self.driver.quit()
+            try:
+                dados = {
+                    'site_da_vaga': self.site_name,
+                    'link_site': url,
+                    'link_origem': 'www.glassdoor.com.br/Vaga/index.htm'
+                    + header_json['applyUrl'],
+                    'data_publicacao': datetime.strptime(job_json['discoverDate'], '%Y-%m-%dT%H:%M:%S').date(),
+                    'data_expiracao': '',
+                    'data_coleta': datetime.now().date(),
+                    'posicao': job_title.capitalize(),
+                    'senioridade': '',
+                    'titulo_da_vaga': header_json['jobTitleText'],
+                    'nome_empresa': header_json['employerNameFromSearch'],
+                    'cidade': map_json['cityName'],
+                    'estado': map_json['stateName'],
+                    'modalidade': modalidade.capitalize()
+                    if 'remoto' in modalidade else '',
+                    'contrato': '',
+                    'regime': '',
+                    'pcd': '',
+                    'codigo_vaga': job_json['listingId'],
+                    'descricao': self.clean_tags(job_json['description']),
+                    'skills': header_json['indeedJobAttribute']['skillsLabel']
+                }
+            except TypeError:
+                continue
+
+            self.save_csv(dados)
+
+            sleep(randint(1, 20))
+
+            urls_processadas += 1
+
+        sleep(10)
+        self.driver.quit()
 
 
 def main():
