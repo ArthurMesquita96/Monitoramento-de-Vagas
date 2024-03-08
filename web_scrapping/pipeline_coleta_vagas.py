@@ -179,6 +179,8 @@ def get_job_opportunity_info(job_url: str, position: str) -> dict:
         job_info['beneficios'] = None
     
 
+    job_info['skills'] = None
+
 
     try:
         job_info['codigo_vaga'] = job_page.select('.job-breadcrumb li')[1].text.strip()
