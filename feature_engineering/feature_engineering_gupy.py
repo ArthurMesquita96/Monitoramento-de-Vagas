@@ -302,7 +302,7 @@ def replace_specifics_substrings(benefits_str: str) -> str:
 
     return benefits_str
 
-def format_skills_list(skills_list: list[str], skills_map: dict[str:list]) -> list[str] | None:
+def format_skills_list(skills_list: list[str], skills_map: dict[str, list]) -> list[str] | None:
 
     try:
         skills_list_formatted = []
@@ -336,14 +336,40 @@ def format_skills_list(skills_list: list[str], skills_map: dict[str:list]) -> li
         return None
 
 skills_map = {
-    'Power BI': ['power bi', 'pbi', 'powerbi'],
-    'Python': ['python', 'phython'],
-    'SQL':['sql'],
-    'No-SQL':['no sql'],
-    'Pacote Office': ['pacite office', 'office'],
-    'Excel': ['excel'],
-    'Tableau':['tableau'],
-    'Clickview': ['clickview']
+    'Analytics':          ['kpi', 'metricas', 'indicadores', 'analise de dados'],
+    'Banco de dados':     ['bancos de dados', 'banco de dados', 'relacion'],
+    'Big data':           ['big data'],
+    'Clickview':          ['clickview'],
+    'Cloud':              ['azure', 'aws', 'gcp', 'nuvem', 'cloud'],
+    'Databricks':         ['databricks'],
+    'Data Mining':        ['mining'],
+    'Data Warehouse':     ['warehouse', 'datawarehouse'],
+    'Dataviz':            ['dashboard', 'relatorio'],
+    'Docker':             ['docker', 'container'],
+    'ETL':                ['etl'],
+    'Estatística':        ['estatistica'],
+    'Excel':              ['excel'],
+    'Git':                ['git', 'versionamento'],
+    'Java':               ['java'],
+    'Linguagem R':        [' r ', ' r,'],
+    'Linux':              ['linux'],
+    'Machine Learning':   ['machine'],
+    'Matlab':             ['matlab'],
+    'Modelagem de dados': ['modelagem', 'modelos de dados'],
+    'MongoDB':            ['mongodb'],
+    'MySQL':              ['mysql'],
+    'NoSQL':              ['no sql'],
+    'Oracle':             ['oracle'],
+    'Pacote Office':      ['pacote office', 'office'],
+    'PostgreSQL':         ['postgres'],
+    'Power BI':           ['power bi', 'pbi', 'powerbi', 'dax'],
+    'Pós-graduação':      ['pos-graduacao', 'mestrado', 'doutorado'],
+    'Python':             ['python', 'phython'],
+    'Scala':              [' scala'],
+    'Spark':              ['spark'],
+    'SQL':                ['sql'],
+    'Storytelling':       ['storytelling'],
+    'Tableau':            ['tableau'],
 }
 
 df_vagas['skills'] = df_vagas['descricao'].apply(lambda descricao: format_skills_list(get_skills_list(descricao), skills_map))

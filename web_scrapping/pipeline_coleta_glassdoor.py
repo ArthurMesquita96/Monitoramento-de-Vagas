@@ -230,7 +230,7 @@ class GlassdoorScraper(JobScraper):
 
                 if qnt_jobs >= int(qnt_vagas) or \
                         int(qnt_vagas) - qnt_jobs > 10:
-                    filepath = '/home/artbdr/Documents/repos/Monitoramento-de-Vagas/data/data_raw/tmp/glassdoor.json'
+                    filepath = 'data/data_raw/tmp/glassdoor.json'
 
                     links_json = self.__get_job_urls(
                         './/a[contains(@id, "job-title")]')
@@ -252,7 +252,7 @@ class GlassdoorScraper(JobScraper):
         sleep(3)
 
         job_urls = self.get_json_file(
-            '/home/artbdr/Documents/repos/Monitoramento-de-Vagas/data/data_raw/tmp/glassdoor.json')
+            'data/data_raw/tmp/glassdoor.json')
 
         urls_processadas = 0
 
@@ -286,6 +286,8 @@ class GlassdoorScraper(JobScraper):
 
                 if self.__verify_json():
                     self.driver.refresh()
+                    
+                    wait = WebDriverWait(self.driver, 50)
                     wait.until(
                         lambda driver: driver.execute_script(
                             "return document.readyState") == "complete"
@@ -315,7 +317,7 @@ class GlassdoorScraper(JobScraper):
                     'data_coleta': datetime.now().date(),
                     'posicao': job_title.capitalize(),
                     'senioridade': '',
-                    'titulo_da_vaga': header_json['jobTitleText'],
+                    'titulo_vaga': header_json['jobTitleText'],
                     'nome_empresa': header_json['employerNameFromSearch'],
                     'cidade': map_json['cityName'],
                     'estado': map_json['stateName'],
