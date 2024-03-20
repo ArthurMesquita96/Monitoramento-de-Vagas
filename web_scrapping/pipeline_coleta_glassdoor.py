@@ -253,9 +253,14 @@ class GlassdoorScraper(JobScraper):
 
                 # ! Coloquei uma condição para que não pegue mais de 870 jobs
                 if qnt_jobs >= int(qnt_vagas) or \
+<<<<<<< HEAD
                         int(qnt_vagas) - qnt_jobs < 10 or \
                     qnt_jobs >= 870:
                     filepath = '/home/artbdr/Documents/repos/Monitoramento-de-Vagas/data/data_raw/tmp/glassdoor.json'
+=======
+                        int(qnt_vagas) - qnt_jobs > 10:
+                    filepath = 'data/data_raw/tmp/glassdoor.json'
+>>>>>>> 4dca0e5546a196b245e333b24d7f3643efc8ffd9
 
                     links_json = self.__get_job_urls(
                         './/a[contains(@id, "job-title")]', job_title)
@@ -276,7 +281,12 @@ class GlassdoorScraper(JobScraper):
 
         sleep(3)
 
+<<<<<<< HEAD
         while os.path.exists('/home/artbdr/Documents/repos/Monitoramento-de-Vagas/data/data_raw/tmp/glassdoor.json'):
+=======
+        job_urls = self.get_json_file(
+            'data/data_raw/tmp/glassdoor.json')
+>>>>>>> 4dca0e5546a196b245e333b24d7f3643efc8ffd9
 
             job_urls = self.get_json_file(
                 '/home/artbdr/Documents/repos/Monitoramento-de-Vagas/data/data_raw/tmp/glassdoor.json')
@@ -298,7 +308,16 @@ class GlassdoorScraper(JobScraper):
                 try:
                     self.driver.get(url)
                     self.driver.refresh()
+<<<<<<< HEAD
                     sleep(3)
+=======
+                    
+                    wait = WebDriverWait(self.driver, 50)
+                    wait.until(
+                        lambda driver: driver.execute_script(
+                            "return document.readyState") == "complete"
+                    )
+>>>>>>> 4dca0e5546a196b245e333b24d7f3643efc8ffd9
 
                     i = 0
                     while True:
@@ -309,7 +328,36 @@ class GlassdoorScraper(JobScraper):
                             self.driver.refresh()
                             sleep(5)
 
+<<<<<<< HEAD
                         i += 1
+=======
+            try:
+                dados = {
+                    'site_da_vaga': self.site_name,
+                    'link_site': url,
+                    'link_origem': 'www.glassdoor.com.br/Vaga/index.htm'
+                    + header_json['applyUrl'],
+                    'data_publicacao': datetime.strptime(job_json['discoverDate'], '%Y-%m-%dT%H:%M:%S').date(),
+                    'data_expiracao': '',
+                    'data_coleta': datetime.now().date(),
+                    'posicao': job_title.capitalize(),
+                    'senioridade': '',
+                    'titulo_vaga': header_json['jobTitleText'],
+                    'nome_empresa': header_json['employerNameFromSearch'],
+                    'cidade': map_json['cityName'],
+                    'estado': map_json['stateName'],
+                    'modalidade': modalidade.capitalize()
+                    if 'remoto' in modalidade else '',
+                    'contrato': '',
+                    'regime': '',
+                    'pcd': '',
+                    'codigo_vaga': job_json['listingId'],
+                    'descricao': self.clean_tags(job_json['description']),
+                    'skills': header_json['indeedJobAttribute']['skillsLabel']
+                }
+            except TypeError:
+                continue
+>>>>>>> 4dca0e5546a196b245e333b24d7f3643efc8ffd9
 
                     if self.__verify_json():
                         self.driver.refresh()

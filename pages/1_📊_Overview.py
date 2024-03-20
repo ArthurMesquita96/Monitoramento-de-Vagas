@@ -12,7 +12,22 @@ from streamlit_folium import folium_static
 
 st.set_page_config(page_title='Overview', page_icon='📊', layout='wide')
 
-### Senioridade #######
+
+# =====================================================================================
+# Helper functions
+# =====================================================================================
+
+def get_job_count_position(data: pd.DataFrame, position: str) -> int:
+
+    if position in data['posicao'].unique():
+        job_count = data.query('posicao == @position').shape[0]
+
+        return job_count
+    
+    job_count = data.shape[0]
+
+    return job_count
+
 
 def platform_job_position_count(data: pd.DataFrame, platform: str) -> pd.DataFrame:
     df_platform = data.query('site_da_vaga == @platform')
@@ -24,29 +39,24 @@ def platform_job_position_count(data: pd.DataFrame, platform: str) -> pd.DataFra
                         .rename(columns={'site_da_vaga': 'vagas'}) 
                     )
     return df_platform
-
-def senioridade_job_position_count(data: pd.DataFrame, position: str) -> pd.DataFrame:
-    df_level = data.query('posicao == @position')
-
-    df_level = ( df_level[['senioridade', 'site_da_vaga']]
-                        .groupby('senioridade')
-                        .count()
-                        .reset_index()
-                        .rename(columns={'site_da_vaga': 'vagas'}) 
-                    )
-    return df_level
-
-def platform_bar_graph(data: pd.DataFrame) -> None:
     
-    fig = px.bar( data, x='senioridade', y='vagas', title='Vagas por Senioridade')
+
+def plot_bar_graph(data: pd.DataFrame, x: str, y: str, title: str, vertical: bool=False) -> None:
+
+    if vertical:
+
+        fig = px.bar( data, x=x, y=y, title=title, orientation='h', color=x)
+        #fig.update_layout(coloraxis_showscale=False)
+        fig.update_coloraxes(showscale=False)
+
+    else:
+        fig = px.bar( data, x=x, y=y, title=title)
 
     st.plotly_chart(fig, use_container_width=True)
     
     return None
 
-#######################
-# Mapa
-######################
+
 def adjust_states_names(state_name: str) -> str:
 
     # adiciona espaço onde há letras maiusculas
@@ -56,6 +66,7 @@ def adjust_states_names(state_name: str) -> str:
     state_name = re.sub(r'(d[oe])(?=\s)', r' \1', state_name)   # 'Rio Grandedo Sul' -> 'Rio Grande do Sul'
 
     return state_name
+
 
 def get_geographical_data(data: pd.DataFrame) -> pd.DataFrame:
 
@@ -111,6 +122,7 @@ def get_geographical_data(data: pd.DataFrame) -> pd.DataFrame:
 
     return df_map
 
+
 def plot_brazil_map(data_map: pd.DataFrame) -> None:
 
     colormap = branca.colormap.LinearColormap(
@@ -164,24 +176,27 @@ def plot_brazil_map(data_map: pd.DataFrame) -> None:
 
     return None
 
-#########################
-### Skills 
-#####################
-def get_skills_list(data: pd.DataFrame) -> set:
+
+def get_skills_list(data: pd.DataFrame) -> list:
     unique_skills = set()
 
     for _, row in data.iterrows():
         
         try:
-            lista_skills = re.findall(r'\'(.*?)\'', row['skills'])
+            skills_list = re.findall(r'\'(.*?)\'', row['skills'])
             
-            unique_skills.update(lista_skills)
+            unique_skills.update(skills_list)
         except:
             continue
 
-    return unique_skills
+    return list( unique_skills )
 
-def get_skills_dataframe(data: pd.DataFrame, skills_list: list, columns: list) -> pd.DataFrame:
+
+def get_skills_dataframe(data: pd.DataFrame) -> pd.DataFrame:
+
+    skills_list = get_skills_list(data)
+    skills_list.sort()
+
     data_list = []
 
     for _, row in data.iterrows():
@@ -195,91 +210,23 @@ def get_skills_dataframe(data: pd.DataFrame, skills_list: list, columns: list) -
                     row_skills.append(False)
         except:
             pass
-
-        row_skills = [row['codigo_vaga'], row['site_da_vaga']] + row_skills
         
         data_list.append(row_skills)
 
-    return pd.DataFrame(data=data_list, columns=columns)
 
-def plot_bar_graph(data: pd.DataFrame, top_skills: int) -> None:
+    skills_df = pd.DataFrame(data=data_list, columns=skills_list)
 
-    series_aux = ( data.drop(['codigo_vaga', 'site_da_vaga'], axis=1)
+
+    skills_df = ( skills_df
                     .sum()
                     .sort_values(ascending=False)
-            )
-    
-    series_aux = series_aux.iloc[:top_skills] 
+                    .reset_index(name='count')
+                    .rename(columns={'index': 'skill'})
+                )
 
-    fig = px.bar(
-            x=series_aux.index,
-            y=series_aux.values,
-            labels={'x': 'Skills', 'y': 'Número de Vagas'},
-            title=f'Top {top_skills} Skills por Vagas'
-        )
 
-    st.plotly_chart(fig, use_container_width=True)
+    return skills_df
 
-    return None
-
-#######################
-### Benefits 
-######################
-
-def get_benefits_list(data: pd.DataFrame) -> set:
-    unique_benefits = set()
-
-    for _, row in data.iterrows():
-        
-        try:
-            lista_beneficios = re.findall(r'\'(.*?)\'', row['beneficios'])
-            
-            unique_benefits.update(lista_beneficios)
-        except:
-            continue
-
-    return unique_benefits
-
-def get_benefits_dataframe(data: pd.DataFrame, benefits_list: list, columns: list) -> pd.DataFrame:
-    data_list = []
-
-    for _, row in data.iterrows():
-        row_benefits = []
-
-        try:
-            for benefit in benefits_list:
-                if benefit in row['beneficios']:
-                    row_benefits.append(True)
-                else:
-                    row_benefits.append(False)
-        except:
-            pass
-
-        row_benefits = [row['codigo_vaga'], row['site_da_vaga']] + row_benefits
-        
-        data_list.append(row_benefits)
-
-    return pd.DataFrame(data=data_list, columns=columns)
-
-def plot_bar_graph(data: pd.DataFrame, top_benefits: int) -> None:
-
-    series_aux = ( data.drop(['codigo_vaga', 'site_da_vaga'], axis=1)
-                    .sum()
-                    .sort_values(ascending=False)
-            )
-    
-    series_aux = series_aux.iloc[:top_benefits] 
-
-    fig = px.bar(
-            x=series_aux.index,
-            y=series_aux.values,
-            labels={'x': 'Benefícios', 'y': 'Número de Vagas'},
-            title=f'Top {top_benefits} Beneficios por Vagas'
-        )
-
-    st.plotly_chart(fig, use_container_width=True)
-
-    return None
 
 
 # =====================================================================================
@@ -309,74 +256,65 @@ df_raw = pd.read_excel('data/data_refined/vagas_full.xlsx')
 
 st.markdown('# Overview')
 
+# --------------------------- Sessão Métricas ------------------------
+
 metric1, metric2, metric3, metric4 = st.columns(4)
 
-metric1.metric('Analista de Dados', df_raw.loc[df_raw['posicao'] == 'Analista de Dados'].shape[0], 'X novas vagas')
-metric2.metric('Cientista de Dados',df_raw.loc[df_raw['posicao'] == 'Cientista de Dados'].shape[0], 'X novas vagas')
-metric3.metric('Engenheiro de Dados', df_raw.loc[df_raw['posicao'] == 'Engenheiro de Dados'].shape[0] , 'X novas vagas')
-metric4.metric('Total', df_raw.shape[0], 'X novas vagas')
+metric1.metric('Analista',   get_job_count_position(df_raw, 'Analista de dados'),   'X novas vagas')
+metric2.metric('Cientista',  get_job_count_position(df_raw, 'Cientista de dados'),  'X novas vagas')
+metric3.metric('Engenheiro', get_job_count_position(df_raw, 'Engenheiro de dados'), 'X novas vagas')
+metric4.metric('Total',      get_job_count_position(df_raw, 'Total'),               'X novas vagas')
 
-st.markdown('## Senioridades por Posição')
 
-glassdor_tab, gupy_tab, vagascom_tab = st.tabs(['Analista de Dados', 'Cientista de Dados', 'Engenheiro de Dados'])
+# ----------------- Distribuição vagas por plataforma ------------------------
+
+glassdor_tab, gupy_tab, vagascom_tab = st.tabs(['Glassdoor', 'Gupy', 'Vagas.com'])
 
 with glassdor_tab:
 
-    cols = st.columns([1, 7])
+    cols = st.columns([3, 7])
     with cols[0]:
-        # st.markdown('#')
-        # st.markdown('## Posição')
-        # st.image('img/glassdoor_logo.png', width=200)
+        st.markdown('#')
+        st.markdown('## Plataforma')
+        st.image('img/glassdoor_logo.png', width=200)
 
-        df_level = senioridade_job_position_count(df_raw, 'Analista de Dados')
-        # st.dataframe(df_level)
+        df_platform = platform_job_position_count(df_raw, 'Glassdoor')
+        st.dataframe(df_platform)
 
     with cols[1]:
-        platform_bar_graph(df_level)
+        plot_bar_graph(df_platform, x='posicao', y='vagas', title='Vagas por posição')
+        
 
 with gupy_tab:
-    cols = st.columns([1, 7])
+    cols = st.columns([3, 7])
     with cols[0]:
-        # st.markdown('#')
-        # st.markdown('## Posição')
-        # st.image('img/gupy_logo.png', width=200)
+        st.markdown('#')
+        st.markdown('## Plataforma')
+        st.image('img/gupy_logo.png', width=200)
 
-        df_level = senioridade_job_position_count(df_raw, 'Cientista de Dados')
-        # st.dataframe(df_level)
+        df_platform = platform_job_position_count(df_raw, 'Gupy')
+        st.dataframe(df_platform)
         
     with cols[1]:
-        platform_bar_graph(df_level)
+        plot_bar_graph(df_platform, x='posicao', y='vagas', title='Vagas por posição')
+        
 
 with vagascom_tab:
-    cols = st.columns([1, 7])
+    cols = st.columns([3, 7])
 
     with cols[0]:
-        # st.markdown('#')
-        # st.markdown('## Posição')
-        # st.image('img/vagas_logo.png', width=200)
+        st.markdown('#')
+        st.markdown('## Plataforma')
+        st.image('img/vagas_logo.png', width=200)
 
-        df_level = senioridade_job_position_count(df_raw, 'Analista de Dados')
-        # st.dataframe(df_level)
+        df_platform = platform_job_position_count(df_raw, 'Vagas.com')
+        st.dataframe(df_platform)
 
     with cols[1]:
-        platform_bar_graph(df_level)
+        plot_bar_graph(df_platform, x='posicao', y='vagas', title='Vagas por posição')
+        
 
-
-st.markdown('## Habilidades por Posição')
-
-skills = list( get_skills_list(df_raw) )
-skills.sort()
-columns = ['codigo_vaga', 'site_da_vaga'] + skills
-df_skills = get_skills_dataframe(df_raw, skills, columns)
-plot_bar_graph(df_skills, 15)
-
-st.markdown('## Benefícios por Posição')
-
-benefits = list( get_benefits_list(df_raw) )
-benefits.sort()
-columns = ['codigo_vaga', 'site_da_vaga'] + benefits
-df_benefits = get_benefits_dataframe(df_raw, benefits, columns)
-plot_bar_graph(df_benefits, 15)
+# --------------------------- Mapa do Brasil ------------------------
 
 st.markdown('#')
 st.markdown('# Visão Geral Brasil')
@@ -384,3 +322,31 @@ st.markdown('# Visão Geral Brasil')
 df_map = get_geographical_data(df_raw)
 
 plot_brazil_map(df_map)
+
+
+# --------------------------- Sessão Skills ------------------------
+
+st.markdown('#')
+st.markdown('# Skills')
+
+cols = st.columns([1, 10])
+
+with cols[0]:
+    st.markdown(4*'<br>', unsafe_allow_html=True)
+    top_skills = st.radio(label='**Data Skills**', options=['top 15', 'top 20', 'top 25', 'todas'])
+
+with cols[1]:
+
+    skills_df = get_skills_dataframe(df_raw)
+
+    try:
+        top = int( re.findall(r'\d+', top_skills)[0] )
+        skills_df = skills_df.loc[:top]
+
+    except:
+        pass
+    
+    skills_df['count'] = skills_df['count'].astype(float)
+    skills_df = skills_df.sort_values('count', ascending=True)
+
+    plot_bar_graph(skills_df, x='count', y='skill', title='Most common skills', vertical=True)

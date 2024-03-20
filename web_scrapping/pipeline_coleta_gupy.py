@@ -13,13 +13,14 @@ def vitrine_vagas_gupy(LINK, nome_vaga):
 
     driver = webdriver.Chrome()
     driver.get(LINK)
+    time.sleep(3)
     driver.maximize_window()
     try:
         cuidado_golpes = driver.find_element(By.XPATH, '//*[@id="radix-0"]/div[2]/button')
         cuidado_golpes.click()
     except:
         pass
-    search = driver.find_element(By.XPATH, '/html/body/div/main/div/div/div[2]/div/div/div/div/div[2]/input')
+    search = driver.find_element(By.XPATH, '//*[@id="undefined-input"]')
     search.send_keys(nome_vaga)
     search.send_keys(Keys.ENTER)
 
@@ -127,6 +128,7 @@ def coleta_dados_vagas(soup, nome_vaga):
 
         try:
             response = requests.get(vaga.findAll('a')[0]['href']) # link da vaga
+            time.spleep(3)
             page = BeautifulSoup(response.text, 'html.parser')
 
             try:
@@ -183,4 +185,4 @@ if __name__ == '__main__':
         
     df_vagas_full.reset_index()
 
-    df_vagas_full.to_excel('data/data_raw/vagas_gupy_raw.xlsx', index=False)
+    df_vagas_full.to_excel('../data/data_raw/vagas_gupy_raw.xlsx', index=False)
