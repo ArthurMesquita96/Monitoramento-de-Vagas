@@ -128,7 +128,7 @@ def coleta_dados_vagas(soup, nome_vaga):
 
         try:
             response = requests.get(vaga.findAll('a')[0]['href']) # link da vaga
-            time.spleep(3)
+            time.spleep(5)
             page = BeautifulSoup(response.text, 'html.parser')
 
             try:

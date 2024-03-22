@@ -157,7 +157,7 @@ def format_benefits_list(benefit_list: list[str]) -> list[str] | None:
         return None
 
 # Loading Dataframe
-df_gupy = pd.read_excel('data/data_raw/vagas_gupy_raw.xlsx')
+df_gupy = pd.read_excel('../data/data_raw/vagas_gupy_raw.xlsx')
 
 df_vagas = pd.concat([df_gupy], axis=0)
 
@@ -175,7 +175,7 @@ pleno_matches  = ['pleno', ' pl', ' ii', ' ll ']
 senior_matches = ['senior', ' sr', ' iii', ' lll ']
 
 # removendo acentos e deixando letras minúsculas
-df_vagas['titulo_vaga_tratado'] = df_vagas['titulo_vaga'].apply(lambda x: unidecode(x.lower()))
+df_vagas['titulo_vaga_tratado'] = df_vagas['titulo_da_vaga'].apply(lambda x: unidecode(x.lower()))
 
 # aplicando função
 df_vagas['senioridade_junior'] = df_vagas['titulo_vaga_tratado'].apply(lambda titulo_vaga: busca_senioridade(titulo_vaga, junior_matches))
@@ -390,7 +390,7 @@ columns_selected = [
             'data_expiracao',
             'data_coleta',
             'posicao',
-            'titulo_vaga',
+            'titulo_da_vaga',
             'senioridade',
             'cidade',
             'estado',
@@ -405,6 +405,6 @@ columns_selected = [
             'descricao'
 ]
 
-df_vagas[columns_selected].to_excel('data/data_clean/vagas_gupy_clean.xlsx', index=False)
+df_vagas[columns_selected].to_excel('../data/data_clean/vagas_gupy_clean.xlsx', index=False)
 
 
