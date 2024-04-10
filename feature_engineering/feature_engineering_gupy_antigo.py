@@ -1,36 +1,10 @@
 import re
-import numpy as np
 import pandas as pd
 from unidecode import unidecode
 from datetime import datetime
-import bs4
 
 
-df_gupy = pd.read_excel('../data/data_raw/vagas_gupy_raw.xlsx')
-df_vagas = df_gupy.copy()
-
-# site_da_vaga
-df_vagas['site_da_vaga'] = 'Gupy'
-
-# link_site
-df_vagas['link_site'] = df_vagas['link']
-
-# link_origem
-df_vagas['link_origem'] = df_vagas['link']
-
-# data_publicacao
-df_vagas['data_publicacao'] = df_vagas['data_publicacao'].apply(lambda x: x if pd.isnull(x) else pd.to_datetime(x).strftime('%Y-%m-%d'))
-
-# link_origem
-df_vagas['regime'] = np.nan
-
-# descrição
-df_vagas['descricao'] = df_vagas['descricao'].apply(lambda x: x if pd.isnull(x) else bs4.BeautifulSoup(x).text.replace('\xa0',' '))
-df_vagas['pre_requisitos'] = df_vagas['pre_requisitos'].apply(lambda x: x if pd.isnull(x) else bs4.BeautifulSoup(x).text.replace('\xa0',' '))
-df_vagas['responsabilidades'] = df_vagas['responsabilidades'].apply(lambda x: x if pd.isnull(x) else bs4.BeautifulSoup(x).text.replace('\xa0',' '))
-df_vagas['experiencias_relevantes'] = df_vagas['experiencias_relevantes'].apply(lambda x: x if pd.isnull(x) else bs4.BeautifulSoup(x).text.replace('\xa0',' '))
-df_vagas['descricao'] = df_vagas['descricao'] + '\n' + df_vagas['pre_requisitos'] + '\n' + df_vagas['responsabilidades'] + '\n' + df_vagas['experiencias_relevantes']
-
+# função de faz matches com as senioridades das vagas
 def busca_senioridade(titulo_vaga: str, match_list: list[str]) -> bool:
     """Identifica se a senioridade label está dentro do titulo da vaga
 
@@ -54,31 +28,6 @@ def busca_senioridade(titulo_vaga: str, match_list: list[str]) -> bool:
     
     return senioridade
 
-
-# matches para as senioridades
-junior_matches = ['junior', ' jr'  , ' i', ' l ']
-pleno_matches  = ['pleno', ' pl', ' ii', ' ll ']
-senior_matches = ['senior', ' sr', ' iii', ' lll ']
-
-# removendo acentos e deixando letras minúsculas
-df_vagas['titulo_vaga_tratado'] = df_vagas['titulo_vaga'].apply(lambda x: x if pd.isnull(x) else unidecode(x.lower()))
-
-# aplicando função
-df_vagas['senioridade_junior'] = df_vagas['titulo_vaga_tratado'].apply(lambda titulo_vaga: busca_senioridade(titulo_vaga, junior_matches))
-df_vagas['senioridade_pleno']  = df_vagas['titulo_vaga_tratado'].apply(lambda titulo_vaga: busca_senioridade(titulo_vaga, pleno_matches))
-df_vagas['senioridade_senior'] = df_vagas['titulo_vaga_tratado'].apply(lambda titulo_vaga: busca_senioridade(titulo_vaga, senior_matches))
-
-# categorizando senioridades
-df_vagas['senioridade'] = df_vagas[['senioridade_junior', 
-                                    'senioridade_pleno', 
-                                    'senioridade_senior']].apply(lambda x:  'Pleno/Sênior' if (x['senioridade_pleno']) and (x['senioridade_senior']) else
-                                                                            'Júnior/Pleno' if (x['senioridade_junior']) and (x['senioridade_pleno']) else
-                                                                            'Júnior' if x['senioridade_junior'] else 
-                                                                            'Pleno' if x['senioridade_pleno'] else
-                                                                            'Sênior' if x['senioridade_senior'] else
-                                                                            'Não informado'
-                                                                    , axis = 1)
-
 def get_benefits_list(description: str) -> list[str] | None:
     """Obtém a lista de benefícios a partir da descrição da vaga
 
@@ -101,10 +50,16 @@ def get_benefits_list(description: str) -> list[str] | None:
         # a lista de beneficios geralmente esta contida na seção 'ADDITIONAL INFORMATION' (existem alguns casos que isso não é verdade)
         
         # divide a descricao em seções
-        benefit_str = description.split('\n')[0]
+        description_sections = description.split('\n')
+        
+        # obtem o indice da seção 'ADDITIONAL INFORMATION' (geralmente é o terceiro indice mas existem paginas com menos seções)
+        index_benefit = [ True if 'Informações adicionais' in section else False for section in description_sections ].index( True )
+
+        # seleciona a seção 'ADDITIONAL INFORMATION'
+        benefit_str = description_sections[index_benefit]
 
         # substitui multiplos espaços em sequência por apenas um
-        # benefit_str = re.sub(r'\s+', ' ', description_sections[0])
+        benefit_str = re.sub(r'\s+', ' ', benefit_str)
 
         # adiciona um ponto-virgula ou ')' onde uma letra maiuscula é antecida por uma minuscula, precisamos dessa condição porque
         # em muitos casos não existe um caracter utilizado para deixar clara separação entre os benefícios dentro da string; nessa
@@ -201,6 +156,54 @@ def format_benefits_list(benefit_list: list[str]) -> list[str] | None:
     except:
         return None
 
+# Loading Dataframe
+df_gupy = pd.read_excel('../data/data_raw/vagas_gupy_raw.xlsx')
+
+df_vagas = df_gupy.copy()
+
+## Tratamento de Dados
+df_vagas['site_da_vaga'] = 'Gupy'
+df_vagas['data_publicacao'] = df_vagas['data_publicacao'].apply(lambda x: datetime.strptime(x.replace('Publicada em: ', '').replace('/', '-'),'%d-%m-%Y').strftime('%Y-%m-%d'))
+df_vagas['data_coleta'] = df_vagas['data_coleta']
+df_vagas['pcd'] = df_vagas['pcd'].apply(lambda x: 'Sim' if x == 'Também p/ PcD' else 'Não informado')
+
+
+# Senioridade
+
+# matches para as senioridades
+junior_matches = ['junior', ' jr'  , ' i', ' l ']
+pleno_matches  = ['pleno', ' pl', ' ii', ' ll ']
+senior_matches = ['senior', ' sr', ' iii', ' lll ']
+
+# removendo acentos e deixando letras minúsculas
+df_vagas['titulo_vaga_tratado'] = df_vagas['titulo_da_vaga'].apply(lambda x: x if pd.isnull(x) else unidecode(x.lower()))
+
+# aplicando função
+df_vagas['senioridade_junior'] = df_vagas['titulo_vaga_tratado'].apply(lambda titulo_vaga: busca_senioridade(titulo_vaga, junior_matches))
+df_vagas['senioridade_pleno']  = df_vagas['titulo_vaga_tratado'].apply(lambda titulo_vaga: busca_senioridade(titulo_vaga, pleno_matches))
+df_vagas['senioridade_senior'] = df_vagas['titulo_vaga_tratado'].apply(lambda titulo_vaga: busca_senioridade(titulo_vaga, senior_matches))
+
+# categorizando senioridades
+df_vagas['senioridade'] = df_vagas[['senioridade_junior', 
+                                    'senioridade_pleno', 
+                                    'senioridade_senior']].apply(lambda x:  'Pleno/Sênior' if (x['senioridade_pleno']) and (x['senioridade_senior']) else
+                                                                            'Júnior/Pleno' if (x['senioridade_junior']) and (x['senioridade_pleno']) else
+                                                                            'Júnior' if x['senioridade_junior'] else 
+                                                                            'Pleno' if x['senioridade_pleno'] else
+                                                                            'Sênior' if x['senioridade_senior'] else
+                                                                            'Não informado'
+                                                                    , axis = 1
+                                                            )
+
+# Localidade
+
+df_vagas['cidade'] = df_vagas['local'].apply(lambda x: 'Não informado' if x == 'Não informado' else x.split(' - ')[0])
+df_vagas['estado'] = df_vagas['local'].apply(lambda x: 'Não informado' if x == 'Não informado' else x.split(' - ')[1])
+
+df_vagas['estado'] = df_vagas.apply( lambda column: 'Todo o Brasil' if ( column['estado'] == 'Não informado' and column['modalidade'] == 'Remoto' ) else
+                                                    column['estado'],
+                                    axis=1
+                            )
 
 # Beneficios
 
@@ -245,7 +248,9 @@ benefit_map = {
     'Vale-transporte':                       ['transporte'],
 }
 
-df_vagas['beneficios'] = df_vagas['experiencias_relevantes'].apply( lambda descricao: format_benefits_list(get_benefits_list(descricao)) )
+df_vagas['beneficios'] = df_vagas['descricao'].apply( lambda descricao: format_benefits_list(get_benefits_list(descricao)) )
+
+## Skills
 
 def get_skills_list(description: str) -> list[str] | None:
     '''
@@ -259,7 +264,13 @@ def get_skills_list(description: str) -> list[str] | None:
         # a lista de beneficios geralmente esta contida na seção 'ADDITIONAL INFORMATION' (existem alguns casos que isso não é verdade)
         
         # divide a descricao em seções
-        skills_str = description
+        skills_sections = description.split('\n')
+        
+        # obtem o indice da seção 'ADDITIONAL INFORMATION' (geralmente é o terceiro indice mas existem paginas com menos seções)
+        index_benefit = [ True if 'Requisitos e qualificações' in section else False for section in skills_sections ].index( True )
+
+        # seleciona a seção 'ADDITIONAL INFORMATION'
+        skills_str = skills_sections[index_benefit]
 
         # substitui multiplos espaços em sequência por apenas um
         skills_str = re.sub(r'\s+', ' ', skills_str)
@@ -347,49 +358,83 @@ def build_skills_map(data, macro:bool = False):
         return dict_macro_tema, dict_micro_tema
     else:
         return dict_micro_tema
-    
+
 dict_skills = pd.read_excel('../dicionario-skills.xlsx', sheet_name='Habilidades')
 
 skills_map_macro, skills_map_micro = build_skills_map(dict_skills, macro=True)
 
-df_vagas['habilidades_micro'] = df_vagas['descricao'].apply(lambda descricao: format_skills_list(get_skills_list(descricao), skills_map_micro))
+# skills_map = {
+#     'Analytics':          ['kpi', 'metricas', 'indicadores', 'analise de dados'],
+#     'Banco de dados':     ['bancos de dados', 'banco de dados', 'relacion'],
+#     'Big data':           ['big data'],
+#     'Clickview':          ['clickview'],
+#     'Cloud':              ['azure', 'aws', 'gcp', 'nuvem', 'cloud'],
+#     'Databricks':         ['databricks'],
+#     'Data Mining':        ['mining'],
+#     'Data Warehouse':     ['warehouse', 'datawarehouse'],
+#     'Dataviz':            ['dashboard', 'relatorio'],
+#     'Docker':             ['docker', 'container'],
+#     'ETL':                ['etl'],
+#     'Estatística':        ['estatistica'],
+#     'Excel':              ['excel'],
+#     'Git':                ['git', 'versionamento'],
+#     'Java':               ['java'],
+#     'Linguagem R':        [' r ', ' r,'],
+#     'Linux':              ['linux'],
+#     'Machine Learning':   ['machine'],
+#     'Matlab':             ['matlab'],
+#     'Modelagem de dados': ['modelagem', 'modelos de dados'],
+#     'MongoDB':            ['mongodb'],
+#     'MySQL':              ['mysql'],
+#     'NoSQL':              ['no sql'],
+#     'Oracle':             ['oracle'],
+#     'Pacote Office':      ['pacote office', 'office'],
+#     'PostgreSQL':         ['postgres'],
+#     'Power BI':           ['power bi', 'pbi', 'powerbi', 'dax'],
+#     'Pós-graduação':      ['pos-graduacao', 'mestrado', 'doutorado'],
+#     'Python':             ['python', 'phython'],
+#     'Scala':              [' scala'],
+#     'Spark':              ['spark'],
+#     'SQL':                ['sql'],
+#     'Storytelling':       ['storytelling'],
+#     'Tableau':            ['tableau'],
+# }
 
-df_vagas['habilidades_macro'] = df_vagas['habilidades_micro'].apply(lambda descricao: format_skills_list(descricao, skills_map_macro))
+# df_vagas['skills_micro'] = df_vagas['descricao'].apply(lambda descricao: format_skills_list(get_skills_list(descricao), skills_map_micro))
+# df_vagas['skills_macro'] = df_vagas['descricao'].apply(lambda descricao: format_skills_list(get_skills_list(descricao), skills_map_macro))
 
-## Tratando valores nulos
+## Contrato
+df_vagas['contrato'] = df_vagas['contrato'].apply(lambda x: 'Autônomo' if x == 'Pessoa Jurídica' else x )
 
-df_vagas['contrato'] = df_vagas['contrato'].fillna('Não informado')
-df_vagas['pcd'] = df_vagas['pcd'].fillna('Não informado')
+## Regime
+df_vagas['regime'] = df_vagas['contrato'].apply(lambda x: 'PJ' if x == 'Autônono' else 'CLT')
 
-df_vagas.loc[df_vagas['cidade'].isna(),'cidade'] = 'Não informado'
-df_vagas.loc[df_vagas['estado'].isna(),'estado'] = 'Não informado'
+# Save Dataframe
 
-df_vagas = df_vagas.dropna(subset=['nome_empresa'])
-
-df_vagas = df_vagas.reset_index()
-
-features_selected = [
-'site_da_vaga',
-'link_site',
-'link_origem',
-'data_publicacao',
-'data_expiracao',
-'data_coleta',
-'posicao',
-'senioridade',
-'titulo_vaga',
-'nome_empresa',
-'cidade',
-'estado',
-'modalidade',
-'contrato',
-'regime',
-'pcd',
-'beneficios',
-'habilidades_macro',
-'habilidades_micro',
-'codigo_vaga',
-'descricao'
+columns_selected = [
+            'site_da_vaga',
+            'link_site',
+            'link_origem',
+            'data_publicacao',
+            'data_expiracao',
+            'data_coleta',
+            'posicao',
+            'titulo_da_vaga',
+            'senioridade',
+            'cidade',
+            'estado',
+            'modalidade',
+            'nome_empresa',
+            'contrato',
+            'regime',
+            'pcd',
+            'beneficios',
+            # 'skills_macro',
+            # 'skills_micro',
+            'codigo_vaga',
+            'descricao'
 ]
 
-df_vagas[features_selected].to_excel('../data/data_clean/vaga_gupy_clean.xlsx', index = False)
+df_vagas[columns_selected].to_excel('../data/data_clean/vagas_gupy_clean.xlsx', index=False)
+
+print(df_vagas.shape)

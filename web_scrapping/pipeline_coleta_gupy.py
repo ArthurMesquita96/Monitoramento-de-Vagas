@@ -50,7 +50,7 @@ def vitrine_vagas_gupy(LINK, nome_vaga):
 
 def coleta_dados_vagas(soup, nome_vaga):
 
-    lista_de_vagas = soup.find_all('div', {'class':'sc-a3bd7ea-0 HCzvP'})
+    lista_de_vagas = soup.find_all('ul', {'class':'ssc-a01de6b-0 ypLsU'})
 
     list_columns = [
             'site_da_vaga',
@@ -174,15 +174,17 @@ def busca_vagas(nome_vaga):
 
 if __name__ == '__main__':
 
-    lista_posicoes = ['Analista de Dados', 'Cientista de Dados', 'Engenheiro de Dados']
+    lista_posicoes = ['Cientista de Dados'] #, 'Cientista de Dados', 'Engenheiro de Dados']
     df_vagas_full = pd.DataFrame()
 
     for posicao in lista_posicoes:
         
         df_vagas_aux = busca_vagas(posicao)
+        df_vagas_aux.shape
         
         df_vagas_full = pd.concat([df_vagas_full, df_vagas_aux], axis = 0)
         
     df_vagas_full.reset_index()
 
     df_vagas_full.to_excel('../data/data_raw/vagas_gupy_raw.xlsx', index=False)
+    df_vagas_full.shape
