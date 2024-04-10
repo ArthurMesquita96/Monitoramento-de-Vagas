@@ -1,0 +1,487 @@
+{
+    "props": {
+        "pageProps": {
+            "job": {
+                "id": 5333845,
+                "name": "Cientista de Dados",
+                "description": "\u003cp\u003e\u003cstrong style=\"color: rgb(55, 65, 81);\"\u003eSobre Nós:\u003c/strong\u003e\u003c/p\u003e\u003cp\u003e\u003cspan style=\"color: rgb(55, 65, 81);\"\u003eSomos uma construtora líder no setor e estamos em busca de talentos apaixonados por tecnologia e inovação. Se você é uma pessoa curiosa, proativa e com expertise em desenvolvimento Python, análise de dados, inteligência artificial e machine learning, queremos conhecê-lo!\u003c/span\u003e\u003c/p\u003e\u003cp\u003e\u003cstrong style=\"color: rgb(55, 65, 81);\"\u003eO que buscamos:\u003c/strong\u003e\u003c/p\u003e\u003cp\u003e\u003cspan style=\"color: rgb(55, 65, 81);\"\u003eUm(a) Especialista em Desenvolvimento Python que seja apaixonado(a) por desafios e esteja pronto(a) para revolucionar nossos processos internos. Queremos alguém com conhecimentos em matemática aplicada e habilidades para transformar dados em insights valiosos, impulsionando nossas decisões de negócio.\u003c/span\u003e\u003c/p\u003e",
+                "prerequisites": "\u003cul\u003e\u003cli\u003eExperiência sólida em desenvolvimento Python com enfoque em análise de dados.\u003c/li\u003e\u003cli\u003eFormação em Matemática Aplicada, Ciência da Computação, Engenharia ou áreas correlatas.\u003c/li\u003e\u003cli\u003eConhecimento em bibliotecas Python relevantes para análise de dados e machine learning.\u003c/li\u003e\u003cli\u003eHabilidades em SQL e experiência com bancos de dados.\u003c/li\u003e\u003cli\u003ePensamento analítico e habilidades para resolver problemas complexos.\u003c/li\u003e\u003cli\u003eComunicação eficiente e espírito colaborativo.\u003c/li\u003e\u003c/ul\u003e",
+                "handicapped": true,
+                "urlPicture": null,
+                "addressLine": "Avenida Wladimir Meirelles Ferreira, 1465, Ribeirão Preto, São Paulo, Brasil, 14021-630",
+                "addressCity": "Ribeirão Preto",
+                "addressState": "São Paulo",
+                "addressStateShortName": "SP",
+                "addressCountry": "BRA",
+                "jobType": "vacancy_type_effective",
+                "jobSteps": [
+                    {
+                        "id": 31366291,
+                        "name": "Cadastro",
+                        "order": 0,
+                        "type": "register"
+                    },
+                    {
+                        "id": 31370232,
+                        "name": "Estudo de Caso",
+                        "order": 1,
+                        "type": "offline"
+                    },
+                    {
+                        "id": 31370292,
+                        "name": "Entrevista",
+                        "order": 2,
+                        "type": "offline"
+                    },
+                    {
+                        "id": 31370324,
+                        "name": "Entrevista com Gestores",
+                        "order": 3,
+                        "type": "offline"
+                    },
+                    {
+                        "id": 31366292,
+                        "name": "Contratação",
+                        "order": 100,
+                        "type": "final"
+                    }
+                ],
+                "responsibilities": "\u003cul\u003e\u003cli\u003eDesenvolver soluções inovadoras em Python para análise de dados e inteligência de negócios.\u003c/li\u003e\u003cli\u003eUtilizar técnicas avançadas de machine learning para criar modelos preditivos que impactem positivamente nossos projetos futuros.\u003c/li\u003e\u003cli\u003eTrabalhar em equipe para entender nossas necessidades e fornecer soluções analíticas inteligentes.\u003c/li\u003e\u003cli\u003eColaborar em projetos de transformação digital e impulsionar a inovação em nossa construtora.\u003c/li\u003e\u003c/ul\u003e",
+                "relevantExperiences": "\u003cul\u003e\u003cli\u003eFaça parte de uma equipe dinâmica e colaborativa.\u003c/li\u003e\u003cli\u003eOportunidades para crescimento profissional e desenvolvimento de habilidades técnicas.\u003c/li\u003e\u003cli\u003eTrabalhe em projetos inovadores no setor de construção.\u003c/li\u003e\u003cli\u003eAmbiente flexível com possibilidade de trabalho remoto.\u003c/li\u003e\u003c/ul\u003e",
+                "urlSmartphonePicture": null,
+                "urlSocialPicture": null,
+                "status": "published",
+                "code": "14675",
+                "reason": "staff_increase",
+                "publishedAt": "2023-08-24T14:59:50.237Z",
+                "expiresAt": "2023-09-11",
+                "workplaceType": "hybrid",
+                "publicationType": "external",
+                "videoSectionTitle": null,
+                "videoUrl": null,
+                "skills": [],
+                "addressCountryShortName": "BRA",
+                "registerEndDate": null,
+                "isJobPostedOnGoogle": true,
+                "company": {
+                    "id": 1669,
+                    "timezone": "America/Sao_Paulo",
+                    "subdomain": "bild"
+                },
+                "careerPage": {
+                    "name": "Bild Desenvolvimento Imobiliário",
+                    "urlLogo": "https://attachments.gupy.io/production/companies/1669/career/2554/images/2020-09-30_15-00_logo.png",
+                    "urlSite": "",
+                    "companyDescriptionTitle": "Faça parte do nosso Time!",
+                    "about": "\u003cp class=\"ql-align-justify\"\u003e\u003cstrong style=\"color: black;\"\u003eO momento de olhar para o novo. O novo jeito de morar, novo jeito de nos relacionar, o novo jeito de viver.\u003c/strong\u003e\u003c/p\u003e\u003cp class=\"ql-align-justify\"\u003e\u003cbr\u003e\u003c/p\u003e\u003cp class=\"ql-align-justify\"\u003e\u003cspan style=\"color: black;\"\u003eNão temos medo de tentar, de arriscar e, se erramos, não nos deixamos abalar mas aproveitamos para aprender, assim nos tornamos quem somos.\u003c/span\u003e\u003c/p\u003e\u003cp class=\"ql-align-justify\"\u003e\u003cbr\u003e\u003c/p\u003e\u003cp class=\"ql-align-justify\"\u003e\u003cstrong style=\"color: black;\"\u003eNão nos limitamos, a cimento, vidro e aço!\u003c/strong\u003e\u003c/p\u003e\u003cp class=\"ql-align-justify\"\u003e\u003cbr\u003e\u003c/p\u003e\u003cp class=\"ql-align-justify\"\u003e\u003cspan style=\"color: black;\"\u003eTemos a honra de acompanhar as transformações nas vidas de \u003c/span\u003e\u003cstrong style=\"color: black;\"\u003enossos clientes\u003c/strong\u003e\u003cspan style=\"color: black;\"\u003e, de vê-los conquistando, formando famílias, realizando sonhos e evoluindo sempre!\u003c/span\u003e\u003c/p\u003e\u003cp class=\"ql-align-justify\"\u003e\u003cspan style=\"color: black;\"\u003e﻿\u003c/span\u003e\u003c/p\u003e\u003cp class=\"ql-align-justify\"\u003e\u003cspan style=\"color: black;\"\u003eNossos produtos são o cenário, o chão, o teto para todos esses movimentos, para toda esta vida. Somos orgulhosos de todos que vestem a camisa laranja, adoramos ver nossos colaboradores, crescendo, aprendendo, empreendendo e tendo a felicidade como um valor. Assistimos orgulhosos o crescimento e comprometimento de cada um. Todos os dias, os Bilders acordam para fazer melhor que ontem, com uma inquietude típica destes corações que vibram em laranja, em nosso nome.\u003c/span\u003e\u003c/p\u003e\u003cp class=\"ql-align-justify\"\u003e\u003cbr\u003e\u003c/p\u003e\u003cp\u003e\u003cspan style=\"color: rgb(32, 33, 36);\"\u003eSomos uma empresa em constante movimento e um deles está direcionado à busca de maior \u003c/span\u003e\u003cstrong style=\"color: rgb(32, 33, 36);\"\u003ediversidade e inclusão\u003c/strong\u003e\u003cspan style=\"color: rgb(32, 33, 36);\"\u003e em nosso ecossistema.\u003c/span\u003e\u003c/p\u003e\u003cp\u003e\u003cbr\u003e\u003c/p\u003e\u003cp class=\"ql-align-justify\"\u003e\u003cstrong style=\"color: rgb(32, 33, 36);\"\u003eNossas vagas também são destinadas a Pessoas com Deficiência (PcD).\u003c/strong\u003e\u003c/p\u003e",
+                    "subdomain": "bild",
+                    "urlMainImage": "https://attachments.gupy.io/production/companies/1669/career/2554/images/2020-09-30_15-00_mainImage.png",
+                    "socialPictureUrl": "",
+                    "socialLinks": {
+                        "type": "social_links_section",
+                        "sectionTitle": "Conheça mais sobre nós",
+                        "urlSite": "https://www.bild.com.br",
+                        "urlLinkedin": "https://www.linkedin.com/company/bilddesenvolvimentoimobiliario/",
+                        "urlFacebook": "https://www.facebook.com/BildDesenvolvimentoImobiliario",
+                        "urlInstagram": "https://www.instagram.com/bilddesenvolvimentoimobiliario/"
+                    },
+                    "visibility": "public",
+                    "appearances": {
+                        "id": 3631,
+                        "careerPageId": 2554,
+                        "companyLogoUrl": "https://attachments.gupy.io/production/companies/1669/career/2554/images/2020-09-30_15-00_logo.png",
+                        "bannerUrl": "https://attachments.gupy.io/production/companies/1669/career/2554/images/2020-09-30_15-00_mainImage.png",
+                        "colorsConfig": null
+                    }
+                },
+                "companyIntegrations": {
+                    "gaTrackingCode": ""
+                }
+            },
+            "jobBoardSourceFromHash": "gupy_portal",
+            "subdomain": "bild",
+            "i18nLocale": "pt",
+            "canonicalUrl": "https://bild.gupy.io/jobs/5333845?jobBoardSource=gupy_public_page",
+            "jobBoardSource": "gupy_portal",
+            "_nextI18Next": {
+                "initialI18nStore": {
+                    "pt": {
+                        "404": {
+                            "title": "Não encontrado",
+                            "text": "Ops! Não encontramos a página que você está procurando.",
+                            "altText": "Ilustração de página não encontrada"
+                        },
+                        "badge": {
+                            "tooltip": "Selo de Feedback",
+                            "infoTip": "Selo de Feedback: Esta é uma empresa com alta taxa de retorno e atividade nas vagas nos últimos 3 meses"
+                        },
+                        "common": {
+                            "metadata": {
+                                "googleForJobs": {
+                                    "jobDescriptionTitle": "Descrição da vaga",
+                                    "jobResponsibilitiesAndAssignmentsTitle": "Responsabilidades e atribuições",
+                                    "jobRequirementsAndQualificationsTitle": "Requisitos e qualificações",
+                                    "jobAdditionalInformationsTitle": "Informações adicionais"
+                                }
+                            }
+                        },
+                        "footer": {
+                            "allRights": "Todos os direitos reservados."
+                        },
+                        "header": {
+                            "customHead": {
+                                "jobTitlePrefix": "Página da Vaga"
+                            },
+                            "navMenu": {
+                                "ariaLabel": "Menu principal",
+                                "about": {
+                                    "text": "Sobre",
+                                    "ariaLabel": "Informações sobre a empresa"
+                                },
+                                "jobPosting": {
+                                    "text": "Vagas",
+                                    "ariaLabel": "Lista de vagas publicadas pela empresa"
+                                },
+                                "candidateLogin": {
+                                    "text": "Fazer login como candidato(a)"
+                                },
+                                "candidateApply": {
+                                    "text": "Candidatar-se",
+                                    "tolltipTextDisabled": "As candidaturas para essa vaga estão encerradas",
+                                    "ariaLabel": "Candidatar-se à vaga"
+                                },
+                                "goBackToCareerPage": "Ir para a página da empresa",
+                                "internalJobs": {
+                                    "text": "Acessar vagas internas"
+                                }
+                            },
+                            "companyHeader": {
+                                "cover": {
+                                    "alt": "Foto de capa da empresa"
+                                },
+                                "logo": {
+                                    "alt": "Logotipo {{careerPageName}}"
+                                }
+                            },
+                            "accessibilityIcon": "Ícone de accessibilidade",
+                            "pcdText": "Vaga também para PcD",
+                            "remoteWork": {
+                                "remote": "Remoto",
+                                "remoteIcon": "Trabalho Remoto ícone"
+                            },
+                            "hybridWork": {
+                                "hybrid": "Híbrido",
+                                "hybridIcon": "Trabalho Híbrido ícone"
+                            },
+                            "onSiteWork": {
+                                "onSite": "Presencial",
+                                "onSiteIcon": "Trabalho Presencial ícone"
+                            },
+                            "applicationsUntil": "Inscrições abertas até",
+                            "closedApplications": "Inscrições encerradas",
+                            "jobTypes": {
+                                "vacancy_legal_entity": "Pessoa jurídica",
+                                "vacancy_type_apprentice": "Aprendiz",
+                                "vacancy_type_associate": "Associado",
+                                "vacancy_type_talent_pool": "Banco de talentos",
+                                "vacancy_type_effective": "Efetivo",
+                                "vacancy_type_internship": "Estágio",
+                                "vacancy_type_parter": "Sócio",
+                                "vacancy_type_summer": "Trabalho de Verão",
+                                "vacancy_type_temporary": "Temporário",
+                                "vacancy_type_outsource": "Terceiro",
+                                "vacancy_type_trainee": "Trainee",
+                                "vacancy_type_volunteer": "Voluntário",
+                                "vacancy_type_lecturer": "Docente",
+                                "vacancy_type_freelancer": "Freelancer",
+                                "vacancy_type_autonomous": "Autônomo"
+                            },
+                            "copyLink": {
+                                "button": "Copiar link",
+                                "infotip": "Copiar link da vaga",
+                                "ariaLabel": "Botão de copiar link da vaga",
+                                "toastSuccess": "Link copiado",
+                                "toastError": "Erro ao copiar link"
+                            },
+                            "shareVacancy": {
+                                "button": "Compartilhar vaga",
+                                "ariaLabel": "Botão de compartilhar vaga"
+                            },
+                            "jobClosed": "Candidaturas encerradas",
+                            "workIcon": "Modelo de trabalho ícone",
+                            "publishedAt": "Publicada em",
+                            "jobWorkplace": "Local de Trabalho",
+                            "menuAvatar": {
+                                "login": "Entrar",
+                                "loginLabel": "Acesso a área logada",
+                                "editProfile": "Editar perfil",
+                                "myAccount": "Minha conta",
+                                "myApplications": "Minhas candidaturas",
+                                "candidateSupport": "Suporte ao candidato",
+                                "termsAndConditions": "Termos e Condições de uso da Gupy",
+                                "privacyPolicy": "Política de privacidade da Gupy",
+                                "logout": "Sair",
+                                "companiesApplied": "Empresas que me candidatei",
+                                "goBackToMainMenu": "Voltar ao menu principal",
+                                "about": "Sobre",
+                                "messages": "Mensagens",
+                                "bannerPortal": {
+                                    "altImage": "Imagem representando acesso ao portal de vagas",
+                                    "heading": "Encontre novas vagas",
+                                    "textContent": "Acesse o nosso portal para encontrar uma nova oportunidade.",
+                                    "accessPortalButton": "Acessar portal"
+                                }
+                            },
+                            "jobAddress": {
+                                "ariaLabel": "Local de trabalho: {{jobAddress}}"
+                            },
+                            "jobType": {
+                                "ariaLabel": "Tipo de vaga: {{jobType}}"
+                            },
+                            "workplaceType": {
+                                "ariaLabel": "Modelo de trabalho: {{workplaceType}}"
+                            }
+                        },
+                        "helpButton": {
+                            "label": "Central de ajuda Gupy para pessoas candidatas"
+                        },
+                        "jobInfo": {
+                            "description": "Descrição da vaga",
+                            "responsibilities": "Responsabilidades e atribuições",
+                            "prerequisites": "Requisitos e qualificações",
+                            "additionalInfo": "Informações adicionais",
+                            "jobSteps": "Etapas do processo"
+                        },
+                        "jobList": {
+                            "amountFiltersAndJobs": "$t(amountJobs, {\"count\": {{countJobs}} }) para $t(amountFilters, {\"count\": {{countFilters}} })",
+                            "amountFilters_zero": "{{count}} filtros aplicados",
+                            "amountFilters_one": "{{count}} filtro aplicado",
+                            "amountFilters_other": "{{count}} filtros aplicados",
+                            "amountJobs_zero": "{{count}} vagas encontradas",
+                            "amountJobs_one": "{{count}} vaga encontrada",
+                            "amountJobs_other": "{{count}} vagas encontradas",
+                            "jobListAmount_zero": "Não há vagas",
+                            "jobListAmount_one": "{{count}} vaga",
+                            "jobListAmount_other": "{{count}} vagas",
+                            "jobSearchLabel": "Busca de Vagas",
+                            "jobsPerPageLabel": "Itens por página",
+                            "jobTypesFilterLabel": "Tipo de Vaga",
+                            "jobWorkplacesFilterLabel": "Locais de Trabalho",
+                            "jobDepartmentsFilterLabel": "Áreas",
+                            "jobSearchFilterPlaceholder": "Digite o nome da vaga",
+                            "jobTypesFilterPlaceholder": "Todas",
+                            "jobWorkplacesFilterPlaceholder": "Todos",
+                            "jobDepartmentsFilterPlaceholder": "Todas",
+                            "jobListFilterOptionsLabel": "Opções de Filtro de Vaga",
+                            "jobListLabel": "Lista de Vagas",
+                            "remoteWork": {
+                                "remote": "Remoto",
+                                "full": "Trabalho Remoto",
+                                "partial": "e Remoto"
+                            },
+                            "hybridWork": {
+                                "hybrid": "Híbrido",
+                                "full": "Trabalho Híbrido",
+                                "partial": "e Híbrido"
+                            },
+                            "vacancy_type_apprentice": "Aprendiz",
+                            "vacancy_type_associate": "Associado",
+                            "vacancy_type_talent_pool": "Banco de talentos",
+                            "vacancy_type_effective": "Efetivo",
+                            "vacancy_type_internship": "Estágio",
+                            "vacancy_legal_entity": "Pessoa jurídica",
+                            "vacancy_type_parter": "Sócio",
+                            "vacancy_type_summer": "Trabalho de Verão",
+                            "vacancy_type_temporary": "Temporário",
+                            "vacancy_type_outsource": "Terceiro",
+                            "vacancy_type_trainee": "Trainee",
+                            "vacancy_type_volunteer": "Voluntário",
+                            "vacancy_type_lecturer": "Docente",
+                            "vacancy_type_freelancer": "Freelancer",
+                            "vacancy_type_autonomous": "Autônomo",
+                            "jobItem": {
+                                "defaultAriaLabel": "Vaga para {{jobType}} como {{jobTitle}}",
+                                "jobWorkplaceAriaLabel": "em {{jobWorkplace}}"
+                            },
+                            "startList": "Voltar para início da lista de vagas",
+                            "skipList": "Pular lista de vagas",
+                            "selectedOptionTitle": "Opção selecionada: ",
+                            "pagination": {
+                                "paginationAriaLabel": "Paginação do resultado da busca",
+                                "nextButtonAriaLabel": "Vá para próxima página",
+                                "previousButtonAriaLabel": "Vá para página anterior",
+                                "pageButtonAriaLabel": "Página"
+                            }
+                        },
+                        "socialLinks": {
+                            "section": {
+                                "ariaLabel": "Seção de links da empresa"
+                            },
+                            "linksList": {
+                                "ariaLabel": "Lista de links"
+                            }
+                        },
+                        "talentPoolEnrollment": {
+                            "description": "Não encontrou a vaga que procurava? Participe do nosso banco de talentos!",
+                            "triggerButtonText": "Participar do banco de talentos",
+                            "triggerButtonTextLoading": "Aguarde.",
+                            "dialog": {
+                                "title": "Participação confirmada!",
+                                "description": "Você está participando do nosso banco de talentos.",
+                                "confirmButtonText": "Ok, entendi"
+                            },
+                            "toast": {
+                                "description": "\u003cs\u003e\u003cbold\u003eErro:\u003c/bold\u003e Não foi possível realizar a inscrição no banco de talentos. Tente novamente mais tarde.\u003c/s\u003e"
+                            }
+                        },
+                        "testimonials": {
+                            "section": {
+                                "ariaLabel": "Seção de Depoimentos"
+                            },
+                            "testimonialCard": {
+                                "ariaLabel": "Depoimento {{depoCount}} de {{depoTotal}}"
+                            }
+                        },
+                        "unauthorized": {
+                            "title": "Não autorizado",
+                            "heading": "Ops, parece que você não tem permissão para visualizar esta página",
+                            "why": "Essa página é destinada ao recrutamento interno de pessoas que trabalham na Empresa {{companyName}}, por isso pode ser que você não tenha permissão para acessá-la.",
+                            "how": "Caso trabalhe na Empresa {{companyName}}, entre em contato com a área de recursos humanos e solicite o seu acesso.",
+                            "portal": {
+                                "heading": "Encontre novas vagas",
+                                "text": "Você pode encontrar uma nova oportunidade no nosso portal.",
+                                "link": "Acessar portal"
+                            }
+                        },
+                        "video": {
+                            "section": {
+                                "ariaLabel": "Seção de vídeos"
+                            },
+                            "iframe": {
+                                "title": "Vídeo sobre a empresa"
+                            }
+                        },
+                        "safe-check-dialog": {
+                            "title": "Cuidado com golpes!",
+                            "paragraph": "Fique de olho: a Gupy não realiza cobranças de nenhum tipo de valores financeiros às pessoas candidatas por WhatsApp, ligações ou similares. Caso receba alguma abordagem assim finalize o contato e não compartilhe seus dados pessoais.",
+                            "linkText": "Saiba como se proteger",
+                            "confirmButton": "Ok, entendi."
+                        },
+                        "jobFilters": {
+                            "jobSearchLabel": "Busca de vagas",
+                            "jobSearchFilterPlaceholder": "Digite o nome da vaga",
+                            "applyFilters": "Aplicar filtros",
+                            "resetFilters": "Limpar filtros",
+                            "heading": "Filtrar",
+                            "filters": {
+                                "workingModel": {
+                                    "title": "Modelo de trabalho",
+                                    "options": {
+                                        "on-site": "Presencial",
+                                        "hybrid": "Híbrido",
+                                        "remote": "Remoto"
+                                    }
+                                },
+                                "jobType": {
+                                    "title": "Tipo de vaga",
+                                    "placeholder": "Selecione"
+                                },
+                                "state": {
+                                    "title": "Estado",
+                                    "placeholder": "Selecione"
+                                },
+                                "city": {
+                                    "title": "Cidade",
+                                    "placeholder": "Selecione"
+                                },
+                                "department": {
+                                    "title": "Área da vaga",
+                                    "placeholder": "Selecione"
+                                }
+                            },
+                            "chipPreviewFilter": {
+                                "groupAriaLabel": "Filtros aplicados",
+                                "closeButton": "Remover filtro",
+                                "seeMoreButton": "ver mais",
+                                "seeMoreButtonAriaLabel": "ver todos os filtros aplicados",
+                                "seeLessButton": "ver menos",
+                                "seeLessButtonAriaLabel": "ver menos filtros aplicados"
+                            }
+                        },
+                        "maintenance-information-dialog": {
+                            "title": "Aviso de manutenção programada",
+                            "paragraph": "Informamos que o nosso time de tecnologia realizará uma manutenção na plataforma este sábado, dia 11/11/2023, começando meia noite e finalizando às 8h da manhã. Por esta razão, nossa plataforma estará indisponível durante esse período.",
+                            "confirmButton": "Ok, entendi."
+                        },
+                        "jobStepsList": {
+                            "step": "Etapa"
+                        },
+                        "skip-content-link": {
+                            "text": "Pular para o conteúdo principal"
+                        }
+                    }
+                },
+                "initialLocale": "pt",
+                "ns": [
+                    "404",
+                    "badge",
+                    "common",
+                    "footer",
+                    "header",
+                    "helpButton",
+                    "jobInfo",
+                    "jobList",
+                    "socialLinks",
+                    "talentPoolEnrollment",
+                    "testimonials",
+                    "unauthorized",
+                    "video",
+                    "safe-check-dialog",
+                    "jobFilters",
+                    "maintenance-information-dialog",
+                    "jobStepsList",
+                    "skip-content-link"
+                ],
+                "userConfig": {
+                    "i18n": {
+                        "locales": [
+                            "pt",
+                            "en",
+                            "es"
+                        ],
+                        "defaultLocale": "pt",
+                        "localeDetection": false
+                    },
+                    "default": {
+                        "i18n": {
+                            "locales": [
+                                "pt",
+                                "en",
+                                "es"
+                            ],
+                            "defaultLocale": "pt",
+                            "localeDetection": false
+                        }
+                    }
+                }
+            }
+        },
+        "__N_SSP": true
+    },
+    "page": "/job/[hash]",
+    "query": {
+        "jobBoardSource": "gupy_portal",
+        "hash": "eyJqb2JJZCI6NTMzMzg0NSwic291cmNlIjoiZ3VweV9wb3J0YWwifQ=="
+    },
+    "buildId": "X7iKruvvylCMy6HsT0lEd",
+    "isFallback": false,
+    "gssp": true,
+    "locale": "pt",
+    "locales": [
+        "pt",
+        "en",
+        "es"
+    ],
+    "defaultLocale": "pt",
+    "scriptLoader": []
+}
