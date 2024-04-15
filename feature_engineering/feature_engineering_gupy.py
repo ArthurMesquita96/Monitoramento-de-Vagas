@@ -400,4 +400,4 @@ features_selected = [
 'descricao'
 ]
 
-df_vagas[features_selected].to_excel('../data/data_clean/vaga_gupy_clean.xlsx', index = False)
+df_vagas[features_selected].to_excel('../data/data_clean/vagas_gupy_clean.xlsx', index = False)
