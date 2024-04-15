@@ -25,10 +25,10 @@ df_vagas['data_publicacao'] = df_vagas['data_publicacao'].apply(lambda x: x if p
 df_vagas['regime'] = np.nan
 
 # descrição
-df_vagas['descricao'] = df_vagas['descricao'].apply(lambda x: x if pd.isnull(x) else bs4.BeautifulSoup(x).text.replace('\xa0',' '))
-df_vagas['pre_requisitos'] = df_vagas['pre_requisitos'].apply(lambda x: x if pd.isnull(x) else bs4.BeautifulSoup(x).text.replace('\xa0',' '))
-df_vagas['responsabilidades'] = df_vagas['responsabilidades'].apply(lambda x: x if pd.isnull(x) else bs4.BeautifulSoup(x).text.replace('\xa0',' '))
-df_vagas['experiencias_relevantes'] = df_vagas['experiencias_relevantes'].apply(lambda x: x if pd.isnull(x) else bs4.BeautifulSoup(x).text.replace('\xa0',' '))
+df_vagas['descricao'] = df_vagas['descricao'].apply(lambda x: x if pd.isnull(x) else bs4.BeautifulSoup(x, 'html.parser').text.replace('\xa0',' '))
+df_vagas['pre_requisitos'] = df_vagas['pre_requisitos'].apply(lambda x: x if pd.isnull(x) else bs4.BeautifulSoup(x,'html.parser').text.replace('\xa0',' '))
+df_vagas['responsabilidades'] = df_vagas['responsabilidades'].apply(lambda x: x if pd.isnull(x) else bs4.BeautifulSoup(x,'html.parser').text.replace('\xa0',' '))
+df_vagas['experiencias_relevantes'] = df_vagas['experiencias_relevantes'].apply(lambda x: x if pd.isnull(x) else bs4.BeautifulSoup(x,'html.parser').text.replace('\xa0',' '))
 df_vagas['descricao'] = df_vagas['descricao'] + '\n' + df_vagas['pre_requisitos'] + '\n' + df_vagas['responsabilidades'] + '\n' + df_vagas['experiencias_relevantes']
 
 def busca_senioridade(titulo_vaga: str, match_list: list[str]) -> bool:
@@ -350,11 +350,18 @@ def build_skills_map(data, macro:bool = False):
     
 dict_skills = pd.read_excel('../dicionario-skills.xlsx', sheet_name='Habilidades')
 
+dict_competencias = pd.read_excel('../dicionario-skills.xlsx', sheet_name='Competências')
+
 skills_map_macro, skills_map_micro = build_skills_map(dict_skills, macro=True)
+
+competencias_map = build_skills_map(dict_competencias, macro=False)
 
 df_vagas['habilidades_micro'] = df_vagas['descricao'].apply(lambda descricao: format_skills_list(get_skills_list(descricao), skills_map_micro))
 
-df_vagas['habilidades_macro'] = df_vagas['habilidades_micro'].apply(lambda descricao: format_skills_list(descricao, skills_map_macro))
+df_vagas['habilidades_macro'] = df_vagas['habilidades_micro'].apply(lambda habilidade: format_skills_list(habilidade, skills_map_macro))
+
+df_vagas['competencias'] = df_vagas['descricao'].apply(lambda descricao: format_skills_list(get_skills_list(descricao), competencias_map))
+
 
 ## Tratando valores nulos
 
@@ -388,6 +395,7 @@ features_selected = [
 'beneficios',
 'habilidades_macro',
 'habilidades_micro',
+'competencias',
 'codigo_vaga',
 'descricao'
 ]
