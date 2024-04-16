@@ -350,7 +350,7 @@ def build_skills_map(data, macro:bool = False):
     
 dict_skills = pd.read_excel('../dicionario-skills.xlsx', sheet_name='Habilidades')
 
-dict_competencias = pd.read_excel('../dicionario-skills.xlsx', sheet_name='Competências')
+dict_competencias = pd.read_excel('../dicionario-skills.xlsx', sheet_name='Competencias')
 
 skills_map_macro, skills_map_micro = build_skills_map(dict_skills, macro=True)
 
