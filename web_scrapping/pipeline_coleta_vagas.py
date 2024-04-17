@@ -254,9 +254,9 @@ def saving_data(position: str, job_list: list) -> None:
     return None
 
 # obtem os dados das vagas
-analista_vagas = get_job_list_info('Analista de Dados', True)
-cientista_vagas = get_job_list_info('Cientista de Dados', True)
-engenharia_vagas = get_job_list_info('Engenharia de Dados', True)
+analista_vagas = get_job_list_info('"Analista de Dados"', True)
+cientista_vagas = get_job_list_info('"Cientista de Dados"', True)
+engenharia_vagas = get_job_list_info('"Engenharia de Dados"', True)
 
 
 # salva as mudanças feitas na coleta atual dentro da pasta 'tmp'
