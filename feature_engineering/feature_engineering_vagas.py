@@ -228,11 +228,11 @@ def clean_vagas_dataframe(df_vagas: pd.DataFrame) -> pd.DataFrame:
 
 df_vagas = pd.read_excel('data/data_raw/vagas_vagas_raw.xlsx')
 
-df_skills = pd.read_excel('dicionario-skills.xlsx', sheet_name='Habilidades')
+df_skills = pd.read_excel('data/dicionario-skills.xlsx', sheet_name='Habilidades')
 
 skills_map_list = df_skills.to_dict('records')
 
-df_capabilities = pd.read_excel('dicionario-skills.xlsx', sheet_name='Competencias')
+df_capabilities = pd.read_excel('data/dicionario-skills.xlsx', sheet_name='Competencias')
 
 capabilities_map_list = df_capabilities.to_dict('records')
 
