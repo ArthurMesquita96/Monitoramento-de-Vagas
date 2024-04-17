@@ -7,8 +7,11 @@ from time import sleep
 
 import psutil
 from bs4 import BeautifulSoup
+from job_scraper import JobScraper
 from selenium import webdriver
-from selenium.common.exceptions import (InvalidSessionIdException,
+from selenium.common.exceptions import (ElementNotInteractableException,
+                                        InvalidSessionIdException,
+                                        NoSuchElementException,
                                         StaleElementReferenceException,
                                         TimeoutException)
 from selenium.webdriver.chrome.service import Service
@@ -16,62 +19,13 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
-from webdriver_manager.chrome import ChromeDriverManager, ChromeType
-
-
-class JobScraper:
-
-    job_titles = ['Cientista de Dados',
-                  'Engenheiro de Dados', 'Analista de Dados']
-
-    def __init__(self, job_titles, site_name) -> None:
-        self.job_titles: list = job_titles
-        self.site_name: str = site_name
-        self.driver = self.__iniciar_selenium()
-
-    def __iniciar_selenium(self, headless=False):
-        my_agent = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
-        options = webdriver.ChromeOptions()
-        options.add_argument(f"user-agent={my_agent}")
-        options.add_argument("--lang=pt-BR")
-        options.add_argument('--disable-dev-shm-usage')
-        options.add_argument("--incognito")
-        options.add_argument('--disable-blink-features=AutomationControlled')
-
-        if headless:
-            options.add_argument('--headless')
-
-        service = Service(ChromeDriverManager().install())
-        driver = webdriver.Chrome(
-            options=options, service=service)
-
-        return driver
-
-    def save_csv(self, linha):
-
-        filename = 'vagas_' + self.site_name.lower() + '_raw.csv'
-        diretorio = '../data/data_raw/'
-
-        filepath = os.path.join(diretorio, filename)
-        file_exists = os.path.isfile(filepath)
-
-        with open(filepath, 'a', newline='') as file:
-            fieldnames = list(linha.keys())
-            writer = csv.DictWriter(file, fieldnames=fieldnames)
-
-            if not file_exists:
-                writer.writeheader()
-
-            writer.writerow(linha)
-
-    def scrape_jobs(self):
-        pass
+from webdriver_manager.chrome import ChromeDriverManager
 
 
 class GlassdoorScraper(JobScraper):
 
-    def __init__(self, site_name) -> None:
-        super().__init__(site_name, 'Glassdoor')
+    def __init__(self) -> None:
+        super().__init__('Glassdoor')
         self.cookie = {"name": "at", "value": "Vffs0MlCIDEfflQ11OInCvejLSP2LJcus1xBWozC4laeA4Xfzb6pv7qDZ_nwxqGx8vddl85T-AGlsgrFvWOm3fmwDp5hZoRrXCoQlk2Xvune7iwSoRLLsAB3X0SorZbu9v_SHQtJ3TH-8DeJGhIUNDFe7nbcqLIDnERzKYMblmuGV7vjGilr4kCHdQsm_TxJu2t9KW2a10gCKYDmmtefQp3RY5JaWyGuy1rFiAbYDs3OnryED52XCKCW-gcOGwrz1mHg6DWAqo87ZwLESUOWplI6L8WSW-F2-K9Z199grBuAb3MLwFokvYoBjWrS8EwgcF0w_cpo3rX9zifSNrvXyp5aFjLXX6gqwbGx5DCikwD423oWNinJ1GC-pZVni0VNPpcJaAy6aIPehY9E0n1c-Fj64lSudtDotmVv1vc5Y7DYjGyCdq2OI24rwf_8We9hupYU9R_45EN869hsAmc57uAG1OXm_AoRH93wbxMxfZSPa2ZBubcFr6UWeGOWM0JLifZjn5ZPmRqBLvNBhfk0V6H9zBsIB8glha60m73wEIBDnxjBc6ysk0JUj6ngOEA9ULt6vtV1_i9dzm3sw4nDaPlJNE7bFNAWX1o0j76pjHRr4ZzWjr52MnqlqcLE3AkMtsStwFGPOjwOny01p-JwXnR7AfmS3dzPgOBdWiDtt-uIATlpy00nZO6azbxMATcPtLj--nrciT6pfzwIUpcMg45SEgbI4qiQnH9RAgw3BiEgXrXDruDhWAdljwePDGJb7GwHUkYGBcgWIqsxah2tRHafGKoBEDLPMV8__Nknbr-OJ-2ppMnCK1jPuR7r9viJUHVEdyCrwpszdwYDe2dvlsGNtIYbDbSGdVk_LaiZscvWdK0EVyHliqxxPQ"}
 
     def pesquisa_chave(self, dictionario, chave):
@@ -111,12 +65,12 @@ class GlassdoorScraper(JobScraper):
         wait.until(
             EC.presence_of_element_located(
                 (By.XPATH,
-                 '//script[contains(text(), "props")]')
+                 '//script[@id and contains(text(), "props")]')
             )
         )
 
         script_tag = self.driver.find_element(
-            'xpath', '//script[contains(text(), "props")]'
+            'xpath', '//script[@id and contains(text(), "props")]'
         ).get_attribute('innerHTML')
         data = json.loads(script_tag)
         job_json = self.pesquisa_chave(data, 'job')
@@ -126,24 +80,6 @@ class GlassdoorScraper(JobScraper):
             return True
 
         return False
-
-    def __iniciar_selenium(self, headless=False):
-        my_agent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36'
-        options = webdriver.ChromeOptions()
-        options.add_argument(f"user-agent={my_agent}")
-        options.add_argument("--lang=pt-BR")
-        options.add_argument('--disable-dev-shm-usage')
-
-        if headless:
-            options.add_argument('--headless')
-
-        service = Service(
-            ChromeDriverManager().install()
-        )
-        driver = webdriver.Chrome(
-            options=options, service=service)
-
-        return driver
 
     def __delete_json(self, filepath, key):
 
@@ -182,13 +118,94 @@ class GlassdoorScraper(JobScraper):
         if self.driver is not None:
             self.driver.quit()
             sleep(3)
-            self.driver = self.__iniciar_selenium(False)
+            self.driver = self._init_selenium(False)
 
-    def __get_links(self):
+    def __close_modal(self):
+        try:
 
-        for job_title in self.job_titles:
+            close_modal = self.driver.find_element(
+                'xpath',
+                '//span[@class="SVGInline modal_closeIcon"]'
+            )
+            close_modal.click()
 
-            self.driver = self.__iniciar_selenium(False)
+        except (StaleElementReferenceException, NoSuchElementException):
+            try:
+
+                self.driver.find_element(
+                    'xpath',
+                    '//button[@data-test="job-alert-modal-close"]'
+                ).click()
+            except (StaleElementReferenceException, NoSuchElementException):
+                pass
+
+    def __exists_xpath(self, xpath):
+
+        try:
+            self.driver.find_element(
+                'xpath',
+                xpath
+            )
+
+            return True
+        except:
+            return False
+
+    def __seleciona_filtro(self, idx_option):
+        self.driver.find_element(
+            'xpath',
+            '//button[@data-test="expand-filters"]'
+        ).click()
+
+        sleep(1)
+
+        self.driver.find_element(
+            'xpath',
+            '//button[@data-test="clear-search-filters"]'
+        ).click()
+
+        sleep(1)
+
+        self.driver.find_element(
+            'xpath',
+            '//button[@data-test="expand-filters"]'
+        ).click()
+
+        sleep(1)
+
+        expand_city = self.driver.find_element(
+            'xpath',
+            '//button[@data-test="cityId"]'
+        )
+        expand_city.click()
+        aria_expanded = expand_city.get_attribute('aria-expanded')
+
+        if aria_expanded == 'false':
+            expand_city.click()
+
+        sleep(3)
+
+        #! verificar se o filtro de cidades está aberto
+        cidades = self.driver.find_elements(
+            'xpath', '//button[@data-test="cityId-option"]')
+
+        sleep(3)
+
+        next_city = cidades[idx_option]
+        next_city.click()
+
+        sleep(2)
+
+        self.driver.find_element(
+            'xpath',
+            '//button[@data-test="apply-search-filters"]'
+        ).click()
+
+    def get_links(self):
+
+        for job_title in self.JOB_TITLES:
+
+            self.driver = self._init_selenium(False)
 
             self.driver.get('https://www.glassdoor.com.br/Vaga/index.htm')
             self.driver.add_cookie(self.cookie)
@@ -209,63 +226,180 @@ class GlassdoorScraper(JobScraper):
 
             sleep(3)
 
-            try:
-                close_modal = self.driver.find_element(
-                    'xpath', '//span[@class="SVGInline modal_closeIcon"]')
-
-                close_modal.click()
-            except StaleElementReferenceException:
-                pass
+            self.__close_modal()
 
             qnt_vagas = self.driver.find_element(
                 'xpath',
                 '//h1[@data-test="search-title"]').get_attribute(
                     'innerHTML').split()[0].replace('.', '')
 
-            i = 0
+            if int(qnt_vagas) > 870:
 
-            while True:
-                sleep(1)
+                self.driver.find_element(
+                    'xpath',
+                    '//button[@data-test="expand-filters"]'
+                ).click()
 
-                try:
-                    load_button = wait.until(
-                        EC.presence_of_element_located(
-                            (By.XPATH, '//button[@data-test="load-more"]')
-                        )
-                    )
-                    load_button.click()
+                self.driver.find_element(
+                    'xpath',
+                    '//button[@data-test="cityId"]'
+                ).click()
 
-                    wait.until(
-                        EC.element_to_be_clickable(
-                            (By.CSS_SELECTOR,
-                             'button[data-test="load-more"][data-loading="false"]')
-                        )
-                    )
-                except TimeoutException:
-                    if i == 2:
+                num_cidades = len(
+                    self.driver.find_elements(
+                        'xpath', '//button[@data-test="cityId-option"]')
+                ) - 1
+
+                self.driver.find_element(
+                    'xpath',
+                    '//button[@data-test="expand-filters"]'
+                ).click()
+
+                idx_option = 0
+
+                while True:
+
+                    if idx_option > num_cidades:
                         break
 
-                    i += 1
-                    continue
+                    self.__close_modal()
 
-                qnt_jobs = len(self.driver.find_elements(
-                    'xpath', './/a[contains(@id, "job-title")]'))
+                    self.__seleciona_filtro(idx_option)
 
-                # ! Coloquei uma condição para que não pegue mais de 870 jobs
-                if qnt_jobs >= int(qnt_vagas) or \
-<<<<<<< HEAD
-                        int(qnt_vagas) - qnt_jobs < 10 or \
-                    qnt_jobs >= 870:
+                    filtro_data = self.driver.find_element(
+                        'xpath',
+                        '//button[@data-test="fromAge"]'
+                    )
+
+                    filtro_data.click()
+
+                    filtro_data.find_element(
+                        'xpath',
+                        '//button[@data-test="fromAge-option"]/div[contains(text(), "Última semana")]'
+                    ).click()
+
+                    self.driver.refresh()
+
+                    sleep(2)
+
+                    self.__close_modal()
+
+                    if self.driver.title.split()[0] == '0':
+                        back_url = self.driver.current_url.split('?')[0]
+                        self.driver.get(back_url)
+                        idx_option += 1
+                        sleep(3)
+                        continue
+
+                    sleep(2)
+
+                    qnt_vagas = self.driver.find_element(
+                        'xpath',
+                        '//h1[@data-test="search-title"]'
+                    ).get_attribute(
+                        'innerHTML').split()[0].replace('.', '')
+
+                    i = 0
+
+                    while True:
+                        sleep(1)
+
+                        jobs_antes = len(
+                            self.driver.find_elements(
+                                'xpath',
+                                './/a[contains(@id, "job-title")]'
+                            )
+                        )
+
+                        if self.__exists_xpath(
+                                '//button[@data-test="load-more"]'):
+
+                            try:
+
+                                load_button = wait.until(
+                                    EC.presence_of_element_located(
+                                        (By.XPATH,
+                                         '//button[@data-test="load-more"]')
+                                    )
+                                )
+                                load_button.click()
+
+                                sleep(3)
+
+                                self.__close_modal()
+
+                                sleep(3)
+
+                            except NoSuchElementException:
+                                self.__close_modal()
+
+                            jobs_depois = len(
+                                self.driver.find_elements(
+                                    'xpath',
+                                    './/a[contains(@id, "job-title")]'
+                                )
+                            )
+
+                            if jobs_antes == jobs_depois:
+                                qnt_jobs = jobs_depois
+                                break
+
+                        else:
+                            qnt_jobs = len(self.driver.find_elements(
+                                'xpath', './/a[contains(@id, "job-title")]'))
+                            break
+
                     filepath = '/home/artbdr/Documents/repos/Monitoramento-de-Vagas/data/data_raw/tmp/glassdoor.json'
-=======
-                        int(qnt_vagas) - qnt_jobs > 10:
-                    filepath = 'data/data_raw/tmp/glassdoor.json'
->>>>>>> 4dca0e5546a196b245e333b24d7f3643efc8ffd9
 
                     links_json = self.__get_job_urls(
                         './/a[contains(@id, "job-title")]', job_title)
                     self.__create_json(links_json, filepath)
-                    break
+
+                    idx_option += 1
+
+                    sleep(5)
+            # TODO: Criar um else para quando não tiver que filtrar por cidades
+            else:
+                while True:
+                    sleep(1)
+
+                    try:
+                        load_button = wait.until(
+                            EC.presence_of_element_located(
+                                (By.XPATH,
+                                    '//button[@data-test="load-more"]')
+                            )
+                        )
+                        load_button.click()
+
+                        sleep(3)
+
+                        self.__close_modal()
+
+                        sleep(3)
+
+                        wait.until(
+                            EC.element_to_be_clickable(
+                                (By.CSS_SELECTOR,
+                                    'button[data-test="load-more"][data-loading="false"]')
+                            )
+                        )
+                    except:
+                        self.__close_modal()
+
+                    qnt_jobs = len(self.driver.find_elements(
+                        'xpath', './/a[contains(@id, "job-title")]'))
+
+                    # ! Coloquei uma condição para que não pegue mais de 870 jobs
+                    if qnt_jobs >= int(qnt_vagas) or \
+                            int(qnt_vagas) - qnt_jobs < 10 or \
+                        qnt_jobs >= 870:
+                        filepath = '/home/artbdr/Documents/repos/Monitoramento-de-Vagas/data/data_raw/tmp/glassdoor.json'
+
+                        links_json = self.__get_job_urls(
+                            './/a[contains(@id, "job-title")]', job_title)
+                        self.__create_json(links_json, filepath)
+                        break
 
             self.driver.quit()
 
@@ -275,23 +409,21 @@ class GlassdoorScraper(JobScraper):
 
         return dados_json
 
+    def __get_expired_date(self):
+        if self.__exists_xpath('//div[@data-test="expired-job-notice"]'):
+            return datetime.now().date()
+        return
+
     def scrape_jobs(self):
 
-        # self.__get_links()
-
-        sleep(3)
-
-<<<<<<< HEAD
         while os.path.exists('/home/artbdr/Documents/repos/Monitoramento-de-Vagas/data/data_raw/tmp/glassdoor.json'):
-=======
-        job_urls = self.get_json_file(
-            'data/data_raw/tmp/glassdoor.json')
->>>>>>> 4dca0e5546a196b245e333b24d7f3643efc8ffd9
 
             job_urls = self.get_json_file(
                 '/home/artbdr/Documents/repos/Monitoramento-de-Vagas/data/data_raw/tmp/glassdoor.json')
 
-            urls_processadas = 0
+            urls_processadas = 1
+
+            self.driver = self._init_selenium(False)
 
             for key, list_jobs in job_urls.items():
 
@@ -308,16 +440,7 @@ class GlassdoorScraper(JobScraper):
                 try:
                     self.driver.get(url)
                     self.driver.refresh()
-<<<<<<< HEAD
                     sleep(3)
-=======
-                    
-                    wait = WebDriverWait(self.driver, 50)
-                    wait.until(
-                        lambda driver: driver.execute_script(
-                            "return document.readyState") == "complete"
-                    )
->>>>>>> 4dca0e5546a196b245e333b24d7f3643efc8ffd9
 
                     i = 0
                     while True:
@@ -328,36 +451,7 @@ class GlassdoorScraper(JobScraper):
                             self.driver.refresh()
                             sleep(5)
 
-<<<<<<< HEAD
                         i += 1
-=======
-            try:
-                dados = {
-                    'site_da_vaga': self.site_name,
-                    'link_site': url,
-                    'link_origem': 'www.glassdoor.com.br/Vaga/index.htm'
-                    + header_json['applyUrl'],
-                    'data_publicacao': datetime.strptime(job_json['discoverDate'], '%Y-%m-%dT%H:%M:%S').date(),
-                    'data_expiracao': '',
-                    'data_coleta': datetime.now().date(),
-                    'posicao': job_title.capitalize(),
-                    'senioridade': '',
-                    'titulo_vaga': header_json['jobTitleText'],
-                    'nome_empresa': header_json['employerNameFromSearch'],
-                    'cidade': map_json['cityName'],
-                    'estado': map_json['stateName'],
-                    'modalidade': modalidade.capitalize()
-                    if 'remoto' in modalidade else '',
-                    'contrato': '',
-                    'regime': '',
-                    'pcd': '',
-                    'codigo_vaga': job_json['listingId'],
-                    'descricao': self.clean_tags(job_json['description']),
-                    'skills': header_json['indeedJobAttribute']['skillsLabel']
-                }
-            except TypeError:
-                continue
->>>>>>> 4dca0e5546a196b245e333b24d7f3643efc8ffd9
 
                     if self.__verify_json():
                         self.driver.refresh()
@@ -366,8 +460,10 @@ class GlassdoorScraper(JobScraper):
                                 "return document.readyState") == "complete"
                         )
 
-                    script_tag = self.driver.find_element('xpath', '//script[contains(text(), "props")]').get_attribute(
-                        'innerHTML')
+                    script_tag = self.driver.find_element(
+                        'xpath',
+                        '//script[@id and contains(text(), "props")]'
+                    ).get_attribute('innerHTML')
                     data = json.loads(script_tag)
                     job_json = self.pesquisa_chave(data, 'job')
                     header_json = self.pesquisa_chave(data, 'header')
@@ -406,10 +502,16 @@ class GlassdoorScraper(JobScraper):
                         'pcd': '',
                         'codigo_vaga': job_json['listingId'],
                         'descricao': self.clean_tags(job_json['description']),
-                        'skills': header_json['indeedJobAttribute']['skillsLabel']
+                        'skills': header_json['indeedJobAttribute']['skillsLabel'] if header_json['indeedJobAttribute'] != None else ''
                     }
                 except TypeError:
-                    continue
+
+                    if self.__exists_xpath(
+                            '//div[@data-test="expired-job-notice"]'):
+                        filepath = '/home/artbdr/Documents/repos/Monitoramento-de-Vagas/data/data_raw/tmp/glassdoor.json'
+                        self.__delete_json(filepath, key)
+
+                        continue
 
                 self.save_csv(dados)
 
@@ -426,10 +528,10 @@ class GlassdoorScraper(JobScraper):
 
 
 def main():
-    job_titles = ['Cientista de Dados', 'Analista de Dados',
-                  'Engenheiro de Dados']
 
-    scraper = GlassdoorScraper(job_titles)
+    scraper = GlassdoorScraper()
+    if not os.path.exists('/home/artbdr/Documents/repos/Monitoramento-de-Vagas/data/data_raw/tmp/glassdoor.json'):
+        scraper.get_links()
     scraper.scrape_jobs()
 
 
