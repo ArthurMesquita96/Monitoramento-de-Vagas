@@ -6,7 +6,7 @@ from datetime import datetime
 import bs4
 
 
-df_gupy = pd.read_excel('../data/data_raw/vagas_gupy_raw.xlsx')
+df_gupy = pd.read_excel('data/data_raw/vagas_gupy_raw.xlsx')
 df_vagas = df_gupy.copy()
 
 # site_da_vaga
@@ -348,9 +348,9 @@ def build_skills_map(data, macro:bool = False):
     else:
         return dict_micro_tema
     
-dict_skills = pd.read_excel('../dicionario-skills.xlsx', sheet_name='Habilidades')
+dict_skills = pd.read_excel('data/dicionario-skills.xlsx', sheet_name='Habilidades')
 
-dict_competencias = pd.read_excel('../dicionario-skills.xlsx', sheet_name='Competências')
+dict_competencias = pd.read_excel('data/dicionario-skills.xlsx', sheet_name='Competencias')
 
 skills_map_macro, skills_map_micro = build_skills_map(dict_skills, macro=True)
 
@@ -400,4 +400,4 @@ features_selected = [
 'descricao'
 ]
 
-df_vagas[features_selected].to_excel('../data/data_clean/vagas_gupy_clean.xlsx', index = False)
+df_vagas[features_selected].to_excel('data/data_clean/vagas_gupy_clean.xlsx', index = False)

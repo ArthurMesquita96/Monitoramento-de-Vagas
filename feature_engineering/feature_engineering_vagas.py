@@ -39,6 +39,36 @@ def subtract_date(date: str, days: int) -> str:
 
 def get_state_uf(state: str) -> str:
     
+    state_uf = {
+            'Acre': 'AC',
+            'Alagoas': 'AL',
+            'Amazonas': 'AM',
+            'Amapá': 'AP',
+            'Bahia': 'BA',
+            'Ceará': 'CE',
+            'Distrito Federal': 'DF',
+            'Espírito Santo': 'ES',
+            'Goiás': 'GO',
+            'Maranhão': 'MA',
+            'Mato Grosso': 'MT',
+            'Mato Grosso do Sul': 'MS',
+            'Minas Gerais': 'MG',
+            'Pará': 'PA',
+            'Paraíba': 'PB',
+            'Paraná': 'PR',
+            'Pernambuco': 'PE',
+            'Piauí': 'PI',
+            'Rio de Janeiro': 'RJ',
+            'Rio Grande do Norte': 'RN',
+            'Rio Grande do Sul': 'RS',
+            'Rondônia': 'RO',
+            'Roraima': 'RR',
+            'Santa Catarina': 'SC',
+            'São Paulo': 'SP',
+            'Sergipe': 'SE',
+            'Tocantins': 'TO'
+    }
+
     if state_uf.get(state) is None:
         return state
     else:
@@ -108,17 +138,44 @@ def format_skills_list(skills_list: list[str]) -> list[str]:
     
     skills_str = unidecode(skills_str).lower()
 
-    skills_list = []
+    micro_skills = []
+    macro_skills = set()
 
-    for skill_name, skill_matches in skills_map.items():
-        match_lookup = any( True if skill in skills_str else False for skill in skill_matches)
+    for skill_map in skills_map_list:
+
+        macro, micro, lookup_string = skill_map.values()
+
+        skill_matches = lookup_string.split(', ')
+        match_lookup = any( True if skill in skills_str else False for skill in skill_matches )
 
         if match_lookup:
-            skills_list.append(skill_name)
+            micro_skills.append(micro)
+            macro_skills.add(macro)
         else:
             continue
-        
-    return skills_list
+    
+    macro_skills = sorted(macro_skills)
+    macro_skills = list(macro_skills)
+
+    return micro_skills, macro_skills
+
+
+def get_capabilities(description: str) -> list[str]:
+
+    description = unidecode(description).lower()
+
+    capability_list = []
+
+    for capability_map in capabilities_map_list:
+        capability, lookup_string = capability_map.values()
+        capability_matches = lookup_string.split(', ')
+
+        match_lookup = any( True if word in description else False for word in capability_matches )
+
+        if match_lookup:
+            capability_list.append(capability)
+
+    return capability_list
 
 
 def clean_vagas_dataframe(df_vagas: pd.DataFrame) -> pd.DataFrame:
@@ -158,81 +215,53 @@ def clean_vagas_dataframe(df_vagas: pd.DataFrame) -> pd.DataFrame:
 
 
     df_vagas['skills'] = df_vagas['descricao'].apply( lambda description: get_skills_list(description) )
-    df_vagas['skills'] = df_vagas['skills'].apply( lambda skills_list: format_skills_list(skills_list) )
+
+    df_vagas['habilidades_micro'] = df_vagas['skills'].apply( lambda skills_list: format_skills_list(skills_list)[0] )
+    df_vagas['habilidades_macro'] = df_vagas['skills'].apply( lambda skills_list: format_skills_list(skills_list)[1] )
+
+    df_vagas['competencias'] = df_vagas['descricao'].apply( lambda description: get_capabilities(description) )
+
 
     return df_vagas
 
 
-state_uf = {
-            'Acre': 'AC',
-            'Alagoas': 'AL',
-            'Amazonas': 'AM',
-            'Amapá': 'AP',
-            'Bahia': 'BA',
-            'Ceará': 'CE',
-            'Distrito Federal': 'DF',
-            'Espírito Santo': 'ES',
-            'Goiás': 'GO',
-            'Maranhão': 'MA',
-            'Mato Grosso': 'MT',
-            'Mato Grosso do Sul': 'MS',
-            'Minas Gerais': 'MG',
-            'Pará': 'PA',
-            'Paraíba': 'PB',
-            'Paraná': 'PR',
-            'Pernambuco': 'PE',
-            'Piauí': 'PI',
-            'Rio de Janeiro': 'RJ',
-            'Rio Grande do Norte': 'RN',
-            'Rio Grande do Sul': 'RS',
-            'Rondônia': 'RO',
-            'Roraima': 'RR',
-            'Santa Catarina': 'SC',
-            'São Paulo': 'SP',
-            'Sergipe': 'SE',
-            'Tocantins': 'TO'
-    }
-
-skills_map = {
-    'Analytics':          ['kpi', 'metricas', 'indicadores', 'analise de dados'],
-    'Banco de dados':     ['bancos de dados', 'banco de dados', 'relacion'],
-    'Big data':           ['big data'],
-    'Clickview':          ['clickview'],
-    'Cloud':              ['azure', 'aws', 'gcp', 'nuvem', 'cloud'],
-    'Databricks':         ['databricks'],
-    'Data Mining':        ['mining'],
-    'Data Warehouse':     ['warehouse', 'datawarehouse'],
-    'Dataviz':            ['dashboard', 'relatorio'],
-    'Docker':             ['docker', 'container'],
-    'ETL':                ['etl'],
-    'Estatística':        ['estatistica'],
-    'Excel':              ['excel'],
-    'Git':                ['git', 'versionamento'],
-    'Java':               ['java'],
-    'Linguagem R':        [' r ', ' r,'],
-    'Linux':              ['linux'],
-    'Machine Learning':   ['machine'],
-    'Matlab':             ['matlab'],
-    'Modelagem de dados': ['modelagem', 'modelos de dados'],
-    'MongoDB':            ['mongodb'],
-    'MySQL':              ['mysql'],
-    'NoSQL':              ['no sql'],
-    'Oracle':             ['oracle'],
-    'Pacote Office':      ['pacote office', 'office'],
-    'PostgreSQL':         ['postgres'],
-    'Power BI':           ['power bi', 'pbi', 'powerbi', 'dax'],
-    'Pós-graduação':      ['pos-graduacao', 'mestrado', 'doutorado'],
-    'Python':             ['python', 'phython'],
-    'Scala':              [' scala'],
-    'Spark':              ['spark'],
-    'SQL':                ['sql'],
-    'Storytelling':       ['storytelling'],
-    'Tableau':            ['tableau'],
-}
-
 
 df_vagas = pd.read_excel('data/data_raw/vagas_vagas_raw.xlsx')
 
+df_skills = pd.read_excel('data/dicionario-skills.xlsx', sheet_name='Habilidades')
+
+skills_map_list = df_skills.to_dict('records')
+
+df_capabilities = pd.read_excel('data/dicionario-skills.xlsx', sheet_name='Competencias')
+
+capabilities_map_list = df_capabilities.to_dict('records')
+
+
 df_vagas = clean_vagas_dataframe(df_vagas)
 
-df_vagas.to_excel('data/data_clean/vagas_vagas_clean.xlsx', index=False)
+features_selected = [
+    'site_da_vaga',
+    'link_site',
+    'link_origem',
+    'data_publicacao',
+    'data_expiracao',
+    'data_coleta',
+    'posicao',
+    'senioridade',
+    'titulo_vaga',
+    'nome_empresa',
+    'cidade',
+    'estado',
+    'modalidade',
+    'contrato',
+    'regime',
+    'pcd',
+    'beneficios',
+    'habilidades_macro',
+    'habilidades_micro',
+    'competencias',
+    'codigo_vaga',
+    'descricao'
+]
+
+df_vagas[features_selected].to_excel('data/data_clean/vagas_vagas_clean.xlsx', index=False)
