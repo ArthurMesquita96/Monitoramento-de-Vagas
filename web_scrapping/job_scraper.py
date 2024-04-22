@@ -10,8 +10,8 @@ from webdriver_manager.chrome import ChromeDriverManager
 
 class JobScraper(metaclass=ABCMeta):
 
-    JOB_TITLES = ['Analista de Dados', 'Cientista de Dados',
-                  'Engenheiro de Dados']
+    JOB_TITLES = ['"Analista de Dados"', '"Cientista de Dados"',
+                  '"Engenheiro de Dados"']
 
     def __init__(self, site_name) -> None:
         self.site_name: str = site_name
