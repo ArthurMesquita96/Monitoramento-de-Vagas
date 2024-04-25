@@ -240,7 +240,7 @@ benefit_map = {
     'Sala de Jogos':                         ['jogos'],
     'Seguro de vida':                        ['vida'],
     'Vale-cultura':                          ['vale cultura', 'vale-cultura'],
-    'Vale-refeição/alimentação':             ['refeicao', 'alimentacao','ticket', 'caju', 'alelo', 'flash'],
+    'Vale-refeição/alimentacao':             ['refeicao', 'refeição', 'refeiçao', 'refeicão','alimentacao','ticket', 'caju', 'alelo', 'flash', ' vr ', ' vr,', 'alimentacao', 'alimentação', 'alimentaçao', 'alimentacão', ' va ', ' va,'],
     'Vale-transporte':                       ['transporte'],
 }
 
